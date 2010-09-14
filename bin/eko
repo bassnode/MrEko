@@ -1,0 +1,93 @@
+#!/usr/bin/env ruby
+$: << File.join(File.dirname(__FILE__), '../lib')
+require 'eko'
+require 'ostruct'
+require 'optparse'
+
+MODES = %w(minor major)
+
+def parse_options
+  
+  options = OpenStruct.new
+  options.format = :pls
+  options.verbose = false
+
+  OptionParser.new do |opts|
+    opts.banner = "Usage: #{$0} [options]"
+
+    opts.separator ""
+    opts.separator "Specific options:"
+
+    opts.on("-m", "--min_tempo BPM", Integer, "Specify minimum tempo") do |bpm|
+      options.min_tempo = bpm
+    end
+
+    opts.on("-M", "--max_tempo BPM", Integer, "Specify maximum tempo") do |bpm|
+      options.max_tempo = bpm
+    end
+
+    opts.on("-d", "--mode MODE", String, "Specify mode (minor or major)") do |mode|
+      raise "Mode must be #{MODES.join(' or ')}" unless MODES.include?(mode)
+      options.mode = mode
+    end
+
+    # # List of arguments.
+    # opts.on("--list x,y,z", Array, "Example 'list' of arguments") do |list|
+    #   options.list = list
+    # end
+
+
+    opts.on("-f", "--format [FORMAT]", [:pls, :m3u],
+            "Select output type (pls, m3u)") do |t|
+      options.format = t
+    end
+
+    # Boolean switch.
+    opts.on("-v", "--[no-]verbose", "Run verbosely") do |v|
+      options.verbose = v
+    end
+
+    opts.separator ""
+    opts.separator "Common options:"
+
+    # No argument, shows at tail.  This will print an options summary.
+    # Try it and see!
+    opts.on_tail("-h", "--help", "Show this message") do
+      puts opts
+      exit
+    end
+
+    # Another typical switch to print the version.
+    # opts.on_tail("--version", "Show version") do
+    #   puts OptionParser::Version.join('.')
+    #   exit
+    # end
+  end.parse!
+
+  options
+end
+
+def scan(files)
+  files.each do |file|
+    Eko::Song.create_from_file!(file)
+  end
+end
+
+case ARGV[0]
+when 'scan'
+  ARGV.shift
+  scan(ARGV)
+when 'playlist'
+  options = parse_options
+  Eko::Playlist.create_from_options(options)
+else
+  puts "nothing for #{ARGV[0]}"
+end
+
+
+#$: droptheboom --min-tempo=130 --max-tempo=150 --mode=minor --output=cool_playlist.pls
+# opts = ParseOpts.blahblah
+# filtered_songs = Eko.songs(opts)
+# Eko.create_playlist(filtered_songs)
+
+

@@ -11,9 +11,11 @@ end
 require "sqlite3"
 require "sequel"
 require "logger"
+require "digest/md5"
 require "echonest"
 
 EKO_ENV = ENV['EKO_ENV'] || 'development'
+Sequel.default_timezone = :utc 
 
 module Eko
   # autoload :Playlist, 'lib/playlist'
@@ -43,7 +45,8 @@ module Eko
     end
     
     def setup_db
-      @connection ||= Sequel.sqlite(db_name)
+      return @connection if @connection
+      @connection = Sequel.sqlite(db_name)
       @connection.loggers << @logger
     end
     

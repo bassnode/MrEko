@@ -2,8 +2,10 @@ class Eko::Song < Sequel::Model
   plugin :validation_helpers
   many_to_many :playlists
   
-  def self.analyze(filename)
-    analysis = Eko.nest.track.analysis(filename)
+  def self.create_from_file!(filename)
+    #analysis = Eko.nest.track.analysis(filename)
+    puts "DOING Echonest ANALYSIS..."
+    create(:filename => filename)
   end
   
   def validate
