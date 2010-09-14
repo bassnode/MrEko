@@ -1,8 +1,6 @@
 begin
-  # Require the preresolved locked set of gems.
   require ::File.expand_path('../.bundle/environment', __FILE__)
 rescue LoadError
-  # Fallback on doing the resolve at runtime.
   require "rubygems"
   require "bundler"
   Bundler.setup
@@ -18,7 +16,6 @@ EKO_ENV = ENV['EKO_ENV'] || 'development'
 Sequel.default_timezone = :utc 
 
 module Eko
-  # autoload :Playlist, 'lib/playlist'
   
   class << self
     
@@ -40,17 +37,20 @@ module Eko
     
     def load!
       @logger ||= Logger.new(STDOUT)
-      setup_db
-      setup_echonest
+      setup_db!
+      setup_echonest!
     end
     
-    def setup_db
+    def setup_db!
       return @connection if @connection
       @connection = Sequel.sqlite(db_name)
       @connection.loggers << @logger
     end
     
-    def setup_echonest
+    # FIXME: Allow the key to be somewhere more public like
+    # in the user's home dir or /etc
+    def setup_echonest!
+      raise "You need to create an api.key" unless File.exists?('api.key')
       @nest ||= Echonest(File.read('api.key'))
     end
     

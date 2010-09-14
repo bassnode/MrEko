@@ -1,37 +1,23 @@
 class EkoTest < Test::Unit::TestCase  
-  
-  context "a new playlist" do
-    setup do
-      @playlist = Eko::Playlist.new
+
+  context "the module" do
+    should "return an Echonest API instance for nest" do
+      assert_instance_of Echonest::Api, Eko.nest
     end
     
-    should "have no songs" do
-      assert_equal 0, @playlist.songs.size
+    should "return a Sequel instance for connection" do
+      assert_instance_of Sequel::SQLite::Database, Eko.connection
+    end
+    
+    should "raise an error when there is no api.key found" do
+      File.expects(:exists?).with('api.key').returns(false)
+      assert_raise(RuntimeError){ Eko.setup_echonest! }
+    end
+    
+    should "return the MD5 of the passed filename" do
+      md5 = Digest::MD5.hexdigest(open(__FILE__).read)
+      assert_equal md5, Eko.md5(__FILE__)
     end
   end
-  
-  # context "instantiation of a new instance" do
-  # 
-  #   context "without a block" do
-  #     should "not save the playlist" do
-  #       Eko::Playlist.any_instance.expects(:save).never
-  #       Eko::Playlist.new
-  #     end
-  #   end
-  #   
-  #   context "with a block" do
-  #     should "yield self" do
-  #       p = Eko::Playlist.new do |list|
-  #         list.name = 'temp'
-  #       end
-  #       assert_equal 'temp', p.name
-  #     end
-  #     
-  #     should "save the playlist" do
-  #       Eko::Playlist.any_instance.expects(:save).once
-  #       Eko::Playlist.new{ |p| p.add_song(Eko::Song.new) }
-  #     end
-  #   end
-  # end
-  # 
+
 end

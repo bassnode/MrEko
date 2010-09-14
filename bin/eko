@@ -1,16 +1,12 @@
 #!/usr/bin/env ruby
 $: << File.join(File.dirname(__FILE__), '../lib')
 require 'eko'
-require 'ostruct'
 require 'optparse'
 
-MODES = %w(minor major)
 
 def parse_options
   
-  options = OpenStruct.new
-  options.format = :pls
-  options.verbose = false
+  options = { :format => :text }
 
   OptionParser.new do |opts|
     opts.banner = "Usage: #{$0} [options]"
@@ -19,16 +15,22 @@ def parse_options
     opts.separator "Specific options:"
 
     opts.on("-m", "--min_tempo BPM", Integer, "Specify minimum tempo") do |bpm|
-      options.min_tempo = bpm
+      options[:min_tempo] = bpm
     end
 
     opts.on("-M", "--max_tempo BPM", Integer, "Specify maximum tempo") do |bpm|
-      options.max_tempo = bpm
+      options[:max_tempo] = bpm
     end
 
+    opts.on("-t", "--time_sig TS", Integer, "Specify time signature") do |ts|
+      options[:time_signature] = ts
+    end
+    
     opts.on("-d", "--mode MODE", String, "Specify mode (minor or major)") do |mode|
-      raise "Mode must be #{MODES.join(' or ')}" unless MODES.include?(mode)
-      options.mode = mode
+      unless Eko::Song::MODES.include?(mode)
+        raise ArgumentError.new("Mode must be #{Eko::Song::MODES.join(' or ')}") 
+      end
+      options[:mode] = mode
     end
 
     # # List of arguments.
@@ -37,15 +39,14 @@ def parse_options
     # end
 
 
-    opts.on("-f", "--format [FORMAT]", [:pls, :m3u],
-            "Select output type (pls, m3u)") do |t|
-      options.format = t
+    opts.on("-f", "--format [FORMAT]", Eko::Playlist::FORMATS,
+            "Select output type (#{Eko::Playlist::FORMATS.join(', ')})") do |format|
+      unless Eko::Playlist::FORMATS.include?(format)
+        raise ArgumentError.new("Format must be one of #{Eko::Playlist::FORMATS.join(', ')}") 
+      end
+      options[:format] = format
     end
 
-    # Boolean switch.
-    opts.on("-v", "--[no-]verbose", "Run verbosely") do |v|
-      options.verbose = v
-    end
 
     opts.separator ""
     opts.separator "Common options:"
@@ -67,19 +68,19 @@ def parse_options
   options
 end
 
-def scan(files)
-  files.each do |file|
-    Eko::Song.create_from_file!(file)
-  end
-end
 
 case ARGV[0]
 when 'scan'
   ARGV.shift
-  scan(ARGV)
+  ARGV.each do |file|
+    Eko::Song.create_from_file!(file)
+  end
 when 'playlist'
   options = parse_options
-  Eko::Playlist.create_from_options(options)
+  format = options.delete(:format)
+  playlist = Eko::Playlist.create_from_options(options)
+  puts playlist.inspect
+  puts playlist.output(format)
 else
   puts "nothing for #{ARGV[0]}"
 end
