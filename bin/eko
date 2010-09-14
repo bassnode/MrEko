@@ -14,16 +14,20 @@ def parse_options
     opts.separator ""
     opts.separator "Specific options:"
 
-    opts.on("-m", "--min_tempo BPM", Integer, "Specify minimum tempo") do |bpm|
+    opts.on("-m", "--min-tempo BPM", Integer, "Specify minimum tempo") do |bpm|
       options[:min_tempo] = bpm
     end
 
-    opts.on("-M", "--max_tempo BPM", Integer, "Specify maximum tempo") do |bpm|
+    opts.on("-M", "--max-tempo BPM", Integer, "Specify maximum tempo") do |bpm|
       options[:max_tempo] = bpm
     end
 
-    opts.on("-t", "--time_sig TS", Integer, "Specify time signature") do |ts|
+    opts.on("-t", "--time-sig SIG", Integer, "Specify time signature") do |ts|
       options[:time_signature] = ts
+    end
+
+    opts.on("-l", "--max-length SEC", Integer, "Specify maximum song length (in seconds)") do |sec|
+      options[:max_duration] = sec
     end
     
     opts.on("-d", "--mode MODE", String, "Specify mode (minor or major)") do |mode|
@@ -33,13 +37,7 @@ def parse_options
       options[:mode] = mode
     end
 
-    # # List of arguments.
-    # opts.on("--list x,y,z", Array, "Example 'list' of arguments") do |list|
-    #   options.list = list
-    # end
-
-
-    opts.on("-f", "--format [FORMAT]", Eko::Playlist::FORMATS,
+    opts.on("-f", "--format FORMAT", Eko::Playlist::FORMATS,
             "Select output type (#{Eko::Playlist::FORMATS.join(', ')})") do |format|
       unless Eko::Playlist::FORMATS.include?(format)
         raise ArgumentError.new("Format must be one of #{Eko::Playlist::FORMATS.join(', ')}") 

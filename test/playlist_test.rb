@@ -73,6 +73,27 @@ class PlaylistTest < Test::Unit::TestCase
       end
     end
     
+    context "for duration" do
+      should "transform even when there aren't any passed duration opts" do
+        opts = {:time_signature => 4}
+        Eko::Playlist.prepare_options!(opts)
+        assert opts.has_key? :duration
+      end
+
+      should "remove min and max keys" do
+        opts = {:min_duration => 100, :max_duration => 2000}
+        Eko::Playlist.prepare_options!(opts)
+        assert !opts.has_key?(:min_duration)
+        assert !opts.has_key?(:max_duration)
+      end
+
+      should "create a range with the passed min and max durations" do
+        opts = {:min_duration => 100, :max_duration => 2000}
+        Eko::Playlist.prepare_options!(opts)
+        assert_equal 100..2000, opts[:duration]
+      end
+    end
+    
     context "for mode" do
       should "transform into numeric representation" do
         opts = {:mode => 'minor'}

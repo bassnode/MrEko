@@ -11,22 +11,24 @@ class Eko::Song < Sequel::Model
     create(:filename => filename)
   end
   
+  # Takes 'minor' or 'major' and returns its integer representation.
+  def self.mode_lookup(mode)
+    MODES.index(mode)
+  end
+
+  # Takes a chromatic key (eg: G#) and returns its integer representation.  
   def self.key_lookup(key_letter)
     CHROMATIC_SCALE.index(key_letter)
   end
   
-  def self.mode_lookup(mode)
-    MODES.index(mode)
-  end
-  
+  # Takes an integer and returns its standard (chromatic) representation.
   def key_letter
     CHROMATIC_SCALE[key]
   end
   
-  
   def validate
     super
-    set_md5 # no callback for this?
+    set_md5 # no Sequel callback for this?
     validates_unique :md5
   end
   

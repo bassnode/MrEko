@@ -5,6 +5,8 @@ class Eko::Playlist < Sequel::Model
   many_to_many :songs
   FORMATS = [:pls, :m3u, :text]
   
+  # Creates and returns a new Playlist from the passed <tt>options</tt>.
+  # <tt>options</tt> should be finder options you pass to Song plus (optionally) :name.
   def self.create_from_options(options)
     # TODO: Is a name (or persisting) even necessary?
     pl = create(:name => options.delete(:name) || "Playlist #{rand(10000)}")
@@ -20,10 +22,15 @@ class Eko::Playlist < Sequel::Model
     end
   end
   
+  # Organize and transform!
   def self.prepare_options!(options)
     min_tempo = options.delete(:min_tempo) || 0
     max_tempo = options.delete(:max_tempo) || 500
     options[:tempo] = min_tempo..max_tempo
+    
+    min_duration = options.delete(:min_duration) || 10 # worthless jams
+    max_duration = options.delete(:max_duration) || 1200 # 20 min.
+    options[:duration] = min_duration..max_duration
     
     if options.has_key?(:mode)
       options[:mode] = Eko::Song.mode_lookup(options[:mode])
@@ -35,6 +42,7 @@ class Eko::Playlist < Sequel::Model
     
   end
   
+  # Return the formatted playlist.  
   def output(format = :pls)
     format = format.to_sym
     raise ArgumentError.new("Format must be one of #{FORMATS.join(', ')}") unless FORMATS.include? format
@@ -49,12 +57,14 @@ class Eko::Playlist < Sequel::Model
     end
   end
   
+  # Returns a text representation of the Playlist.
   def create_text
     songs.inject("") do |list, song|
       list << "#{song.filename}, #{song.title}\n"
     end
   end
-  
+
+  # Returns a PLS representation of the Playlist.  
   def create_pls
     pls = "[playlist]\n"
     pls << "NumberOfEntries=#{songs.size}\n\n"
