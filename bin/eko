@@ -13,7 +13,10 @@ def parse_options
 
     opts.separator ""
     opts.separator "Specific options:"
-
+    opts.on("-p", "--preset NAME", String, "Select a preset.  Options are (#{Eko::Presets::FACTORY.keys.join(', ')})") do |preset|
+      options[:preset] = preset
+    end
+    
     opts.on("-m", "--min-tempo BPM", Integer, "Specify minimum tempo") do |bpm|
       options[:min_tempo] = bpm
     end

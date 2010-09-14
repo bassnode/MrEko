@@ -52,7 +52,23 @@ class PlaylistTest < Test::Unit::TestCase
   
   context "prepare_options!" do
     
+    context "when passed a preset option" do
+      should "only use the presets' options, not the others passed" do
+        opts = { :time_signature => 4, :preset => :gym }
+        Eko::Playlist.prepare_options!(opts)
+        assert !opts.has_key?(:time_signature)
+        assert_equal Eko::Presets::FACTORY[:gym][:tempo], opts[:tempo]
+      end
+    end
+    
     context "for tempo" do
+      
+      should "not transform when tempo is a Range" do
+        opts = {:tempo => 160..180}
+        Eko::Playlist.prepare_options!(opts)
+        assert_equal 160..180, opts[:tempo]
+      end
+      
       should "transform even when there aren't any passed tempo opts" do
         opts = {:time_signature => 4}
         Eko::Playlist.prepare_options!(opts)
@@ -74,6 +90,13 @@ class PlaylistTest < Test::Unit::TestCase
     end
     
     context "for duration" do
+      
+      should "not transform when duration is a Range" do
+        opts = {:duration => 200..2010}
+        Eko::Playlist.prepare_options!(opts)
+        assert_equal 200..2010, opts[:duration]
+      end
+      
       should "transform even when there aren't any passed duration opts" do
         opts = {:time_signature => 4}
         Eko::Playlist.prepare_options!(opts)

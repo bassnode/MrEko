@@ -1,6 +1,8 @@
 class Eko::Playlist < Sequel::Model
   class NoSongsError < Exception; end
   
+  include Eko::Presets
+  
   plugin :validation_helpers
   many_to_many :songs
   FORMATS = [:pls, :m3u, :text]
@@ -24,22 +26,29 @@ class Eko::Playlist < Sequel::Model
   
   # Organize and transform!
   def self.prepare_options!(options)
-    min_tempo = options.delete(:min_tempo) || 0
-    max_tempo = options.delete(:max_tempo) || 500
-    options[:tempo] = min_tempo..max_tempo
+    if preset = options.delete(:preset)
+      options.replace load_preset(preset)
+    else
+      unless options[:tempo].is_a? Range
+        min_tempo = options.delete(:min_tempo) || 0
+        max_tempo = options.delete(:max_tempo) || 500
+        options[:tempo] = min_tempo..max_tempo
+      end    
     
-    min_duration = options.delete(:min_duration) || 10 # worthless jams
-    max_duration = options.delete(:max_duration) || 1200 # 20 min.
-    options[:duration] = min_duration..max_duration
+      unless options[:duration].is_a? Range
+        min_duration = options.delete(:min_duration) || 10 # worthless jams
+        max_duration = options.delete(:max_duration) || 1200 # 20 min.
+        options[:duration] = min_duration..max_duration
+      end
     
-    if options.has_key?(:mode)
-      options[:mode] = Eko::Song.mode_lookup(options[:mode])
-    end
+      if options.has_key?(:mode)
+        options[:mode] = Eko::Song.mode_lookup(options[:mode])
+      end
         
-    if options.has_key?(:key)
-      options[:key] = Eko::Song.key_lookup(options[:key])
+      if options.has_key?(:key)
+        options[:key] = Eko::Song.key_lookup(options[:key])
+      end
     end
-    
   end
   
   # Return the formatted playlist.  

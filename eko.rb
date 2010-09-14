@@ -62,5 +62,7 @@ end
 
 
 Eko.load!
+
+require "lib/presets"
 require "lib/playlist"
 require "lib/song"
