@@ -1,9 +1,9 @@
 module MrEko::Presets
   FACTORY = {
     :gym => {
-      :tempo    => 110..300, # sweat, sweat, sweat!
+      :tempo    => 125..300, # sweat, sweat, sweat!
       :mode     => 'major',  # bring the HappyHappy
-      :duration => 180..360  # shorter, poppier tunes
+      :duration => 180..300  # shorter, poppier tunes
     },
     :chill => {
       :tempo    => 60..120,  # mellow
