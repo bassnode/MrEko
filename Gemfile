@@ -1,4 +1,4 @@
 source :gemcutter
 
-gem "ruby-echonest", :git => "http://github.com/koyachi/ruby-echonest.git", :branch => 'version4'
+gem "ruby-echonest", :git => "http://github.com/bassnode/ruby-echonest.git"
 gemspec

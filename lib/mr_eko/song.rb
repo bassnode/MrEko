@@ -6,11 +6,12 @@ class MrEko::Song < Sequel::Model
   
   def self.create_from_file!(filename)
     analysis = MrEko.nest.track.analysis(filename)
-    profile  = MrEko.nest.track.profile(:md5 => analysis.track_info['sample_md5'])
+    md5 = MrEko.md5(filename)
+    profile  = MrEko.nest.track.profile(:md5 => md5)
 
     song                = new()
     song.filename       = File.expand_path(filename)
-    song.md5            = analysis.track_info['sample_md5']
+    song.md5            = md5
     song.tempo          = analysis.tempo
     song.duration       = analysis.duration
     song.fade_in        = analysis.end_of_fade_in

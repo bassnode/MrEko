@@ -1,4 +1,5 @@
 class MrEko::Playlist < Sequel::Model
+
   class NoSongsError < Exception; end
   
   include MrEko::Presets

@@ -64,6 +64,7 @@ Gem::Specification.new do |s|
   # = MANIFEST =
   s.files = %w[
     Gemfile
+    Gemfile.lock
     README.md
     Rakefile
     bin/mr_eko

@@ -1,7 +1,14 @@
 ENV['EKO_ENV'] = 'test'
-require 'bundler'
+require "bundler/setup"
 Bundler.setup
-Bundler.require :test
+
+require 'test/unit'
+require 'shoulda'
+require 'mocha'
+require "mr_eko"
+
+require 'sequel/extensions/migration'
+Sequel::Migrator.apply(MrEko.connection, File.join(File.dirname(__FILE__), "..", "db", "migrate"))
 
 class Test::Unit::TestCase
   

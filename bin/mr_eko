@@ -1,4 +1,6 @@
 #!/usr/bin/env ruby
+$0 = 'mr_eko'
+
 $: << File.join(File.dirname(__FILE__), '../lib')
 require 'mr_eko'
 require 'optparse'

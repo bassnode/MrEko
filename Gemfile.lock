@@ -1,7 +1,6 @@
 GIT
-  remote: http://github.com/koyachi/ruby-echonest.git
-  revision: 8ecea08b46214592a05e3e610c8b8ebd0a7ef5fc
-  branch: version4
+  remote: http://github.com/bassnode/ruby-echonest.git
+  revision: 005f5261a615ab0b9f903f54a218da9ea758881a
   specs:
     ruby-echonest (0.1.0)
       hashie
