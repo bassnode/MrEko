@@ -1,4 +1,5 @@
-api.key
+.bundle
+*.key
 .DS_Store
 *.log
 *.mp3
