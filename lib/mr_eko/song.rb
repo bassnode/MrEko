@@ -5,8 +5,11 @@ class MrEko::Song < Sequel::Model
   CHROMATIC_SCALE = %w(C C# D D# E F F# G G# A A# B).freeze
   
   def self.create_from_file!(filename)
-    analysis = MrEko.nest.track.analysis(filename)
     md5 = MrEko.md5(filename)
+    existing = where(:md5 => md5).first
+    return existing unless existing.nil?
+    
+    analysis = MrEko.nest.track.analysis(filename)
     profile  = MrEko.nest.track.profile(:md5 => md5)
 
     song                = new()
@@ -20,9 +23,11 @@ class MrEko::Song < Sequel::Model
     song.mode           = analysis.mode
     song.loudness       = analysis.loudness
     song.time_signature = analysis.time_signature
-    song.title          = profile.body.title
-    song.artist         = profile.body.artist
-    song.album          = profile.body.release
+    song.echonest_id    = profile.body.track.id
+    song.danceability   = profile.body.track.audio_summary.danceability
+    song.title          = profile.body.track.title
+    song.artist         = profile.body.track.artist
+    song.album          = profile.body.track.release
 
     song.save
   end
