@@ -3,6 +3,8 @@ $: << File.join(File.dirname(__FILE__), '../lib')
 require 'mr_eko'
 require 'optparse'
 
+require 'sequel/extensions/migration'
+Sequel::Migrator.apply(MrEko.connection, File.join(File.dirname(__FILE__), "..", "db", "migrate"))
 
 def parse_options
   
@@ -13,7 +15,7 @@ def parse_options
 
     opts.separator ""
     opts.separator "Specific options:"
-    opts.on("-p", "--preset NAME", String, "Select a preset.  Options are (#{Eko::Presets::FACTORY.keys.join(', ')})") do |preset|
+    opts.on("-p", "--preset NAME", String, "Select a preset.  Options are (#{MrEko::Presets::FACTORY.keys.join(', ')})") do |preset|
       options[:preset] = preset
     end
     

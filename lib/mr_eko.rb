@@ -60,6 +60,6 @@ end
 
 MrEko.setup!
 
-require "lib/presets"
-require "lib/playlist"
-require "lib/song"
+require "lib/mr_eko/presets"
+require "lib/mr_eko/playlist"
+require "lib/mr_eko/song"

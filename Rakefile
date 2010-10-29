@@ -1,7 +1,7 @@
 require 'rubygems'
 require 'rake'
 require 'date'
-
+require "bundler/version"
 #############################################################################
 #
 # Helper functions
@@ -163,8 +163,8 @@ namespace :db do
   desc "Migrate up to the latest schema"
   task :migrate => :environment do
     require 'sequel/extensions/migration'
-    # Sequel::Migrator.apply(Eko.connection, File.join(File.dirname(__FILE__), "db", "migrate"), 0) # DOWN
-    Sequel::Migrator.apply(Eko.connection, File.join(File.dirname(__FILE__), "db", "migrate"))
+    # Sequel::Migrator.apply(MrEko.connection, File.join(File.dirname(__FILE__), "db", "migrate"), 0) # DOWN
+    Sequel::Migrator.apply(MrEko.connection, File.join(File.dirname(__FILE__), "db", "migrate"))
   end
 
 end

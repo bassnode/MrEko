@@ -50,36 +50,29 @@ Gem::Specification.new do |s|
   s.add_dependency('hashie')
   s.add_dependency('httpclient', "~> 2.1")
   s.add_dependency('json', "= 1.4.6")
-  s.add_dependency('ruby-echonest')
-  # gem "ruby-echonest", :git => "http://github.com/koyachi/ruby-echonest.git", :branch => 'version4'
 
   ## List your development dependencies here. Development dependencies are
   ## those that are only needed during development
   s.add_development_dependency('mocha', "= 0.9.8")
   s.add_development_dependency('shoulda', "~> 2.11")
   s.add_development_dependency('test-unit', "~> 2.1")
-
+  s.add_development_dependency("ruby-debug", "~> 0.10.3")
+  
   ## Leave this section as-is. It will be automatically generated from the
   ## contents of your Git repository via the gemspec task. DO NOT REMOVE
   ## THE MANIFEST COMMENTS, they are used as delimiters by the task.
   # = MANIFEST =
   s.files = %w[
     Gemfile
-    Gemfile.lock
     README.md
     Rakefile
-    bin/eko
     bin/mr_eko
     db/migrate/001_add_playlists.rb
     db/migrate/002_add_songs.rb
-    eko.rb
     lib/mr_eko.rb
     lib/mr_eko/playlist.rb
     lib/mr_eko/presets.rb
     lib/mr_eko/song.rb
-    lib/playlist.rb
-    lib/presets.rb
-    lib/song.rb
     mr_eko.gemspec
     test/eko_test.rb
     test/playlist_test.rb
