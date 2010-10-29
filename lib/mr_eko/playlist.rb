@@ -1,7 +1,7 @@
-class Eko::Playlist < Sequel::Model
+class MrEko::Playlist < Sequel::Model
   class NoSongsError < Exception; end
   
-  include Eko::Presets
+  include MrEko::Presets
   
   plugin :validation_helpers
   many_to_many :songs
@@ -14,7 +14,7 @@ class Eko::Playlist < Sequel::Model
     pl = create(:name => options.delete(:name) || "Playlist #{rand(10000)}")
     prepare_options!(options)
 
-    songs = Eko::Song.where(options).all
+    songs = MrEko::Song.where(options).all
     if songs.size > 0
       songs.each{ |song| pl.add_song(song) }
       pl.save
@@ -42,11 +42,11 @@ class Eko::Playlist < Sequel::Model
       end
     
       if options.has_key?(:mode)
-        options[:mode] = Eko::Song.mode_lookup(options[:mode])
+        options[:mode] = MrEko::Song.mode_lookup(options[:mode])
       end
         
       if options.has_key?(:key)
-        options[:key] = Eko::Song.key_lookup(options[:key])
+        options[:key] = MrEko::Song.key_lookup(options[:key])
       end
     end
   end
@@ -95,4 +95,4 @@ class Eko::Playlist < Sequel::Model
   end
 end
 
-Eko::Playlist.plugin :timestamps
+MrEko::Playlist.plugin :timestamps

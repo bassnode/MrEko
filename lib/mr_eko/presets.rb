@@ -1,4 +1,4 @@
-module Eko::Presets
+module MrEko::Presets
   FACTORY = {
     :gym => {
       :tempo    => 110..300, # sweat, sweat, sweat!

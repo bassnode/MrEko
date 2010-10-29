@@ -1,10 +1,6 @@
-begin
-  require ::File.expand_path('../.bundle/environment', __FILE__)
-rescue LoadError
-  require "rubygems"
-  require "bundler"
-  Bundler.setup
-end
+require "rubygems"
+require "bundler"
+Bundler.setup
 
 require "sqlite3"
 require "sequel"
@@ -15,7 +11,8 @@ require "echonest"
 EKO_ENV = ENV['EKO_ENV'] || 'development'
 Sequel.default_timezone = :utc 
 
-module Eko
+module MrEko
+  VERSION = '0.1.0'
   
   class << self
     
@@ -35,7 +32,7 @@ module Eko
       Digest::MD5.hexdigest(open(filename).read)
     end
     
-    def load!
+    def setup!
       @logger ||= Logger.new(STDOUT)
       setup_db!
       setup_echonest!
@@ -61,7 +58,7 @@ module Eko
 end
 
 
-Eko.load!
+MrEko.setup!
 
 require "lib/presets"
 require "lib/playlist"

@@ -1,6 +1,7 @@
 class EkoTest < Test::Unit::TestCase  
 
   context "the module" do
+    
     should "return an Echonest API instance for nest" do
       assert_instance_of Echonest::Api, Eko.nest
     end

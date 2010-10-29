@@ -1,9 +1,4 @@
 class PlaylistTest < Test::Unit::TestCase  
-  def sequel_dataset_stub
-    data = mock()
-    data.stubs(:all).returns( [] )
-    data
-  end
   
   context "a new playlist" do
     setup do
@@ -53,6 +48,7 @@ class PlaylistTest < Test::Unit::TestCase
   context "prepare_options!" do
     
     context "when passed a preset option" do
+      
       should "only use the presets' options, not the others passed" do
         opts = { :time_signature => 4, :preset => :gym }
         Eko::Playlist.prepare_options!(opts)
@@ -118,6 +114,7 @@ class PlaylistTest < Test::Unit::TestCase
     end
     
     context "for mode" do
+      
       should "transform into numeric representation" do
         opts = {:mode => 'minor'}
         Eko::Playlist.prepare_options!(opts)
@@ -126,6 +123,7 @@ class PlaylistTest < Test::Unit::TestCase
     end
 
     context "for key" do
+      
       should "transform into numeric representation" do
         opts = {:key => 'C#'}
         Eko::Playlist.prepare_options!(opts)

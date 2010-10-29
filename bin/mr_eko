@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 $: << File.join(File.dirname(__FILE__), '../lib')
-require 'eko'
+require 'mr_eko'
 require 'optparse'
 
 
@@ -34,16 +34,16 @@ def parse_options
     end
     
     opts.on("-d", "--mode MODE", String, "Specify mode (minor or major)") do |mode|
-      unless Eko::Song::MODES.include?(mode)
-        raise ArgumentError.new("Mode must be #{Eko::Song::MODES.join(' or ')}") 
+      unless MrEko::Song::MODES.include?(mode)
+        raise ArgumentError.new("Mode must be #{MrEko::Song::MODES.join(' or ')}") 
       end
       options[:mode] = mode
     end
 
-    opts.on("-f", "--format FORMAT", Eko::Playlist::FORMATS,
-            "Select output type (#{Eko::Playlist::FORMATS.join(', ')})") do |format|
-      unless Eko::Playlist::FORMATS.include?(format)
-        raise ArgumentError.new("Format must be one of #{Eko::Playlist::FORMATS.join(', ')}") 
+    opts.on("-f", "--format FORMAT", MrEko::Playlist::FORMATS,
+            "Select output type (#{MrEko::Playlist::FORMATS.join(', ')})") do |format|
+      unless MrEko::Playlist::FORMATS.include?(format)
+        raise ArgumentError.new("Format must be one of #{MrEko::Playlist::FORMATS.join(', ')}") 
       end
       options[:format] = format
     end
@@ -74,12 +74,12 @@ case ARGV[0]
 when 'scan'
   ARGV.shift
   ARGV.each do |file|
-    Eko::Song.create_from_file!(file)
+    MrEko::Song.create_from_file!(file)
   end
 when 'playlist'
   options = parse_options
   format = options.delete(:format)
-  playlist = Eko::Playlist.create_from_options(options)
+  playlist = MrEko::Playlist.create_from_options(options)
   puts playlist.inspect
   puts playlist.output(format)
 else
@@ -89,7 +89,7 @@ end
 
 #$: droptheboom --min-tempo=130 --max-tempo=150 --mode=minor --output=cool_playlist.pls
 # opts = ParseOpts.blahblah
-# filtered_songs = Eko.songs(opts)
-# Eko.create_playlist(filtered_songs)
+# filtered_songs = MrEko.songs(opts)
+# MrEko.create_playlist(filtered_songs)
 
 
