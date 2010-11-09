@@ -12,6 +12,8 @@ class MrEko::Song < Sequel::Model
     analysis = MrEko.nest.track.analysis(filename)
     profile  = MrEko.nest.track.profile(:md5 => md5)
 
+    # TODO: add ruby-mp3info as fallback for parsing ID3 tags
+    # since Echonest seems a bit flaky in that dept.
     song                = new()
     song.filename       = File.expand_path(filename)
     song.md5            = md5
@@ -24,10 +26,12 @@ class MrEko::Song < Sequel::Model
     song.loudness       = analysis.loudness
     song.time_signature = analysis.time_signature
     song.echonest_id    = profile.body.track.id
-    song.danceability   = profile.body.track.audio_summary.danceability
+    song.bitrate        = profile.body.track.bitrate
     song.title          = profile.body.track.title
     song.artist         = profile.body.track.artist
     song.album          = profile.body.track.release
+    song.danceability   = profile.body.track.audio_summary.danceability
+    song.energy         = profile.body.track.audio_summary.energy
 
     song.save
   end
