@@ -5,6 +5,7 @@ Bundler.setup
 require "sqlite3"
 require "sequel"
 require "logger"
+require "hashie"
 require "digest/md5"
 require "echonest"
 

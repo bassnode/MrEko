@@ -1,0 +1,34 @@
+Release Notes for ENMFP codegen
+
+3.10 April 21 2010
+First version
+
+3.11 April 28 2010
+Fencepost bugfix on codestring builder
+
+3.12 May 18 2010
+Codestring now base64 zlib string
+
+3.13 June 24 2010
+Codestring now base64 urlsafe zlib string
+
+3.14 July 7 2010
+Bugfix on JSON emitter (was not escaping properly)
+codegen.Darwin works properly on Mac OS X 10.5 (note: libcodegen is not supported on 10.5 yet, only 10.6/lin/win)
+Codegen reports compute time and decode time in the JSON (no longer to stderr)
+Codegen memory leaks fixed (Jason Sundram)
+Codestring 18% shorter, old ways from 3.10 on still work on the query end (Jason Sundram)
+
+3.15 July XX 2010
+Common.h included in dist
+Threaded mode, activate with -s (mac and linux only, windows will iterate)
+JSON output now by default a list of code queries with tag
+Fixes for iOS 4.0 compatibility
+Lowrank option (testing, off by default)
+Fixed memory leak in FFT routine
+Use Accelerate on iOS 4
+"Too few events detected" no longer throws exception but returns empty codestring
+
+
+
+
