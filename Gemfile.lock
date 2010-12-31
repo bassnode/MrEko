@@ -1,6 +1,6 @@
 GIT
   remote: http://github.com/bassnode/ruby-echonest.git
-  revision: 005f5261a615ab0b9f903f54a218da9ea758881a
+  revision: a6ce0e2d8d5af14a611bf34c7790331a4b5d3302
   specs:
     ruby-echonest (0.1.0)
       hashie
