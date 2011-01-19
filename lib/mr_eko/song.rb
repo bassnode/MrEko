@@ -12,9 +12,20 @@ class MrEko::Song < Sequel::Model
 
   # Using the Echonest Musical Fingerprint lib in the hopes
   # of sidestepping the mp3 upload process.
-  def self.enmfp_data(filename)
-    json = JSON.parse(`#{File.join(MrEko::HOME_DIR, 'ext', 'enmfp', enmfp_binary)} #{File.expand_path(filename)}`).first
-    Hashie::Mash.new(json)
+  def self.enmfp_data(filename, md5)
+    unless File.exists?(fp_location(md5))
+      puts 'Running ENMFP'
+      `#{File.join(MrEko::HOME_DIR, 'ext', 'enmfp', enmfp_binary)} "#{File.expand_path(filename)}" > #{fp_location(md5)}`
+    end
+
+    File.read fp_location(md5)
+  end
+
+  # Return the file path of the EN fingerprint JSON file
+  def self.fp_location(md5)
+    target = File.join(MrEko::HOME_DIR, 'fingerprints')
+    Dir.mkdir(target) unless File.exists?(target)
+    File.expand_path File.join(target, "#{md5}.json")
   end
 
   # Use the platform-specific binary.
@@ -40,16 +51,22 @@ class MrEko::Song < Sequel::Model
     existing = where(:md5 => md5).first
     return existing unless existing.nil?
 
-    code = enmfp_data(filename)
+    fingerprint_data = enmfp_data(filename, md5)
+    fingerprint_json_data = Hashie::Mash.new(JSON.parse(fingerprint_data).first)
 
-    if code.keys.include?('error')
+    if fingerprint_json_data.keys.include?('error')
       analysis = get_analysis_by_filename(filename)
       profile  = MrEko.nest.track.profile(:md5 => md5).body.track
     else
-      puts "!!USING CALCULATED HASH CODE!!:"
-      profile = MrEko.nest.song.identify(:code => code.code)
+      puts "Trying ENMFP code"
+      identify_options = {:code => fingerprint_data}
+      identify_options[:artist]   = fingerprint_json_data.metadata.artist  if fingerprint_json_data.metadata.artist
+      identify_options[:title]    = fingerprint_json_data.metadata.title   if fingerprint_json_data.metadata.title
+      identify_options[:release]  = fingerprint_json_data.metadata.release if fingerprint_json_data.metadata.release
+      profile = MrEko.nest.song.identify(identify_options)
+
       if profile.songs.empty? #ENMFP failed to recognize
-        puts "Having to upload after all, ENMFP fail"
+        puts "Having to upload #{filename} after all (ENMFP errors)"
         analysis = get_analysis_by_filename(filename)
         profile  = MrEko.nest.track.profile(:md5 => md5).body.track
       else
@@ -63,7 +80,7 @@ class MrEko::Song < Sequel::Model
     song                = new()
     song.filename       = File.expand_path(filename)
     song.md5            = md5
-    song.code           = code.code
+    song.code           = fingerprint_json_data.code
     song.tempo          = analysis.tempo
     song.duration       = analysis.duration
     song.fade_in        = analysis.end_of_fade_in

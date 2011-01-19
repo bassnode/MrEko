@@ -9,7 +9,7 @@ require 'sequel/extensions/migration'
 Sequel::Migrator.apply(MrEko.connection, File.join(File.dirname(__FILE__), "..", "db", "migrate"))
 
 def parse_options
-  
+
   options = { :format => :text }
 
   OptionParser.new do |opts|
@@ -20,7 +20,7 @@ def parse_options
     opts.on("-p", "--preset NAME", String, "Select a preset.  Options are (#{MrEko::Presets::FACTORY.keys.join(', ')})") do |preset|
       options[:preset] = preset
     end
-    
+
     opts.on("-m", "--min-tempo BPM", Integer, "Specify minimum tempo") do |bpm|
       options[:min_tempo] = bpm
     end
@@ -36,10 +36,10 @@ def parse_options
     opts.on("-l", "--max-length SEC", Integer, "Specify maximum song length (in seconds)") do |sec|
       options[:max_duration] = sec
     end
-    
+
     opts.on("-d", "--mode MODE", String, "Specify mode (minor or major)") do |mode|
       unless MrEko::Song::MODES.include?(mode)
-        raise ArgumentError.new("Mode must be #{MrEko::Song::MODES.join(' or ')}") 
+        raise ArgumentError.new("Mode must be #{MrEko::Song::MODES.join(' or ')}")
       end
       options[:mode] = mode
     end
@@ -47,7 +47,7 @@ def parse_options
     opts.on("-f", "--format FORMAT", MrEko::Playlist::FORMATS,
             "Select output type (#{MrEko::Playlist::FORMATS.join(', ')})") do |format|
       unless MrEko::Playlist::FORMATS.include?(format)
-        raise ArgumentError.new("Format must be one of #{MrEko::Playlist::FORMATS.join(', ')}") 
+        raise ArgumentError.new("Format must be one of #{MrEko::Playlist::FORMATS.join(', ')}")
       end
       options[:format] = format
     end
@@ -89,11 +89,3 @@ when 'playlist'
 else
   puts "nothing for #{ARGV[0]}"
 end
-
-
-#$: droptheboom --min-tempo=130 --max-tempo=150 --mode=minor --output=cool_playlist.pls
-# opts = ParseOpts.blahblah
-# filtered_songs = MrEko.songs(opts)
-# MrEko.create_playlist(filtered_songs)
-
-

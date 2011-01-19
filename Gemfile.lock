@@ -1,6 +1,6 @@
 GIT
   remote: http://github.com/bassnode/ruby-echonest.git
-  revision: a6ce0e2d8d5af14a611bf34c7790331a4b5d3302
+  revision: d1bac4ec11dbc33ef6d522da90c2aa7969d857ef
   specs:
     ruby-echonest (0.1.0)
       hashie
@@ -22,7 +22,7 @@ GEM
   specs:
     columnize (0.3.2)
     hashie (0.4.0)
-    httpclient (2.1.5.2)
+    httpclient (2.1.6.1)
     json (1.4.6)
     libxml-ruby (1.1.4)
     linecache (0.43)
@@ -36,8 +36,10 @@ GEM
       linecache (>= 0.3)
     sequel (3.15.0)
     shoulda (2.11.3)
-    sqlite3-ruby (1.3.2)
-    test-unit (2.1.1)
+    sqlite3 (1.3.3)
+    sqlite3-ruby (1.3.3)
+      sqlite3 (>= 1.3.3)
+    test-unit (2.1.2)
 
 PLATFORMS
   ruby
