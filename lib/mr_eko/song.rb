@@ -42,10 +42,15 @@ class MrEko::Song < Sequel::Model
     end
   end
 
-  def self.get_analysis_by_filename(filename)
-    MrEko.nest.track.analysis(filename)
+  # Returns the analysis and profile data from Echonest for the given track.
+  def self.get_datapoints_by_filename(filename)
+    analysis = MrEko.nest.track.analysis(filename)
+    profile  = MrEko.nest.track.profile(:md5 => MrEko.md5(filename)).body.track
+
+    return [analysis, profile]
   end
 
+  # TODO: Cleanup - This method is prety ugly now.
   def self.create_from_file!(filename)
     md5 = MrEko.md5(filename)
     existing = where(:md5 => md5).first
@@ -55,8 +60,7 @@ class MrEko::Song < Sequel::Model
     fingerprint_json_data = Hashie::Mash.new(JSON.parse(fingerprint_data).first)
 
     if fingerprint_json_data.keys.include?('error')
-      analysis = get_analysis_by_filename(filename)
-      profile  = MrEko.nest.track.profile(:md5 => md5).body.track
+      analysis, profile = get_datapoints_by_filename(filename)
     else
       puts "Trying ENMFP code"
       identify_options = {:code => fingerprint_data}
@@ -67,11 +71,15 @@ class MrEko::Song < Sequel::Model
 
       if profile.songs.empty? #ENMFP failed to recognize
         puts "Having to upload #{filename} after all (ENMFP errors)"
-        analysis = get_analysis_by_filename(filename)
-        profile  = MrEko.nest.track.profile(:md5 => md5).body.track
+        analysis, profile = get_datapoints_by_filename(filename)
       else
-        profile = profile.songs.first
-        analysis = MrEko.nest.song.profile(:id => profile.id, :bucket => 'audio_summary').songs.first.audio_summary
+        begin
+          profile = profile.songs.first
+          analysis = MrEko.nest.song.profile(:id => profile.id, :bucket => 'audio_summary').songs.first.audio_summary
+        rescue Exception => e
+          puts "Issues using ENMP data, uploading \"#{e}\""
+          analysis, profile = get_datapoints_by_filename(filename)
+        end
       end
     end
 
