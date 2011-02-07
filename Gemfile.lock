@@ -1,6 +1,6 @@
 GIT
   remote: http://github.com/bassnode/ruby-echonest.git
-  revision: d1bac4ec11dbc33ef6d522da90c2aa7969d857ef
+  revision: 9618496ad15ded3ef8db72b23ccd9f65f624566f
   specs:
     ruby-echonest (0.1.0)
       hashie
@@ -21,7 +21,7 @@ GEM
   remote: http://rubygems.org/
   specs:
     columnize (0.3.2)
-    hashie (0.4.0)
+    hashie (1.0.0)
     httpclient (2.1.6.1)
     json (1.4.6)
     libxml-ruby (1.1.4)

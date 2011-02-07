@@ -62,22 +62,22 @@ class MrEko::Song < Sequel::Model
     if fingerprint_json_data.keys.include?('error')
       analysis, profile = get_datapoints_by_filename(filename)
     else
-      puts "Trying ENMFP code"
+      puts "Identifying with ENMFP code"
       identify_options = {:code => fingerprint_data}
       identify_options[:artist]   = fingerprint_json_data.metadata.artist  if fingerprint_json_data.metadata.artist
       identify_options[:title]    = fingerprint_json_data.metadata.title   if fingerprint_json_data.metadata.title
       identify_options[:release]  = fingerprint_json_data.metadata.release if fingerprint_json_data.metadata.release
       profile = MrEko.nest.song.identify(identify_options)
 
-      if profile.songs.empty? #ENMFP failed to recognize
-        puts "Having to upload #{filename} after all (ENMFP errors)"
+      if profile.songs.empty? 
+        # ENMFP wasn't recognized, so upload.
         analysis, profile = get_datapoints_by_filename(filename)
       else
         begin
           profile = profile.songs.first
           analysis = MrEko.nest.song.profile(:id => profile.id, :bucket => 'audio_summary').songs.first.audio_summary
         rescue Exception => e
-          puts "Issues using ENMP data, uploading \"#{e}\""
+          puts "Issues using ENMP data, uploading \"(#{e})\""
           analysis, profile = get_datapoints_by_filename(filename)
         end
       end
