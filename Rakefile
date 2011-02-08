@@ -1,8 +1,7 @@
 require 'rubygems'
 require 'rake'
 require 'date'
-require "bundler"
-Bundler::GemHelper.install_tasks
+# require "bundler"
 #############################################################################
 #
 # Helper functions
@@ -96,6 +95,7 @@ task :release => :build do
   sh "git tag v#{version}"
   sh "git push origin master"
   sh "git push origin v#{version}"
+  sh "gem push #{File.join('pkg', gem_file)}"
 end
 
 desc "Build #{gem_file} into the pkg directory"
