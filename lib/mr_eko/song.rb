@@ -2,8 +2,6 @@ class MrEko::Song < Sequel::Model
   include MrEko::Core
   plugin :validation_helpers
   many_to_many :playlists
-  MODES = %w(minor major)
-  CHROMATIC_SCALE = %w(C C# D D# E F F# G G# A A# B).freeze
 
   # IDEA: This probably won't work since it's creating a new file,
   # but could try uploading a sample of the song (faster).
@@ -68,9 +66,9 @@ class MrEko::Song < Sequel::Model
       identify_options[:release]  = fingerprint_json_data.metadata.release if fingerprint_json_data.metadata.release
       profile = MrEko.nest.song.identify(identify_options)
 
-      if profile.songs.empty?
+      if profile.songs.empty? 
         # ENMFP wasn't recognized, so upload.
-        print " -- "
+        log "ENMP returned nothing, uploading"
         analysis, profile = get_datapoints_by_filename(filename)
       else
         begin
@@ -106,21 +104,6 @@ class MrEko::Song < Sequel::Model
     song.energy         = profile.audio_summary? ? profile.audio_summary.energy       : analysis.energy
 
     song.save
-  end
-
-  # Takes 'minor' or 'major' and returns its integer representation.
-  def self.mode_lookup(mode)
-    MODES.index(mode)
-  end
-
-  # Takes a chromatic key (eg: G#) and returns its integer representation.
-  def self.key_lookup(key_letter)
-    CHROMATIC_SCALE.index(key_letter)
-  end
-
-  # Takes an integer and returns its standard (chromatic) representation.
-  def key_letter
-    CHROMATIC_SCALE[key]
   end
 
   def validate

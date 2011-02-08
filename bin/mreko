@@ -38,8 +38,8 @@ def parse_options
     end
 
     opts.on("-d", "--mode MODE", String, "Specify mode (minor or major)") do |mode|
-      unless MrEko::Song::MODES.include?(mode)
-        raise ArgumentError.new("Mode must be #{MrEko::Song::MODES.join(' or ')}")
+      unless MrEko::MODES.include?(mode)
+        raise ArgumentError.new("Mode must be #{MrEko::MODES.join(' or ')}")
       end
       options[:mode] = mode
     end

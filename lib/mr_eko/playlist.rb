@@ -44,11 +44,11 @@ class MrEko::Playlist < Sequel::Model
       end
 
       if options.has_key?(:mode)
-        options[:mode] = MrEko::Song.mode_lookup(options[:mode])
+        options[:mode] = MrEko.mode_lookup(options[:mode])
       end
 
       if options.has_key?(:key)
-        options[:key] = MrEko::Song.key_lookup(options[:key])
+        options[:key] = MrEko.key_lookup(options[:key])
       end
     end
   end

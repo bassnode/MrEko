@@ -10,7 +10,7 @@ GIT
 PATH
   remote: .
   specs:
-    mr_eko (0.2.0)
+    mr_eko (0.2.2)
       hashie
       httpclient (~> 2.1)
       json (= 1.4.6)

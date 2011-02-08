@@ -11,5 +11,6 @@ module MrEko
         MrEko.logger.send(level, string)
       end
     end
+
   end
 end

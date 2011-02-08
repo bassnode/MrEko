@@ -15,10 +15,13 @@ EKO_ENV = ENV['EKO_ENV'] || 'development'
 Sequel.default_timezone = :utc
 
 module MrEko
-  VERSION = '0.2.1'
+  VERSION = '0.2.2'
   USER_DIR = File.join(ENV['HOME'], ".mreko")
   FINGERPRINTS_DIR = File.join(USER_DIR, 'fingerprints')
   HOME_DIR = File.join(File.dirname(__FILE__), '..')
+
+  MODES = %w(minor major)
+  CHROMATIC_SCALE = %w(C C# D D# E F F# G G# A A# B).freeze
 
   class << self
     attr_accessor :logger
@@ -70,6 +73,21 @@ module MrEko
         return file if File.exists?(file)
       end
       raise "You need to create an echonest_api.key file in #{USER_DIR}"
+    end
+
+    # Takes 'minor' or 'major' and returns its integer representation.
+    def mode_lookup(mode)
+      MODES.index(mode.downcase)
+    end
+
+    # Takes a chromatic key (eg: G#) and returns its integer representation.
+    def key_lookup(key_letter)
+      CHROMATIC_SCALE.index(key_letter.upcase)
+    end
+
+    # Takes an integer and returns its standard (chromatic) representation.
+    def key_letter(key)
+      CHROMATIC_SCALE[key]
     end
   end
 end
