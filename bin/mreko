@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-$0 = 'mr_eko'
+$0 = 'Mr Eko'
 
 $: << File.join(File.dirname(__FILE__), '../lib')
 require 'mr_eko'
@@ -84,7 +84,6 @@ when 'playlist'
   options = parse_options
   format = options.delete(:format)
   playlist = MrEko::Playlist.create_from_options(options)
-  puts playlist.inspect
   puts playlist.output(format)
 else
   puts "nothing for #{ARGV[0]}"

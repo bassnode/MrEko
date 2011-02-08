@@ -1,4 +1,5 @@
 .bundle
+Gemfile.lock
 *.key
 .DS_Store
 *.log

@@ -1,7 +1,8 @@
 require 'rubygems'
 require 'rake'
 require 'date'
-require "bundler/version"
+require "bundler"
+Bundler::GemHelper.install_tasks
 #############################################################################
 #
 # Helper functions
