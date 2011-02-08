@@ -13,8 +13,8 @@ Gem::Specification.new do |s|
   ## If your rubyforge_project name is different, then edit it and comment out
   ## the sub! line in the Rakefile
   s.name              = 'mr_eko'
-  s.version           = '0.2.0'
-  s.date              = '2011-01-19'
+  s.version           = '0.2.1'
+  s.date              = '2011-02-07'
   s.rubyforge_project = 'mr_eko'
 
   ## Make sure your summary is short. The description may be as long
@@ -80,6 +80,7 @@ Gem::Specification.new do |s|
     ext/enmfp/codegen.Linux-x86_64
     ext/enmfp/codegen.windows.exe
     lib/mr_eko.rb
+    lib/mr_eko/core.rb
     lib/mr_eko/playlist.rb
     lib/mr_eko/presets.rb
     lib/mr_eko/song.rb

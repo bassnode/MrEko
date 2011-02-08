@@ -1,4 +1,5 @@
 class MrEko::Song < Sequel::Model
+  include MrEko::Core
   plugin :validation_helpers
   many_to_many :playlists
   MODES = %w(minor major)
@@ -14,7 +15,7 @@ class MrEko::Song < Sequel::Model
   # of sidestepping the mp3 upload process.
   def self.enmfp_data(filename, md5)
     unless File.exists?(fp_location(md5))
-      puts 'Running ENMFP'
+      log 'Running ENMFP'
       `#{File.join(MrEko::HOME_DIR, 'ext', 'enmfp', enmfp_binary)} "#{File.expand_path(filename)}" > #{fp_location(md5)}`
     end
 
@@ -23,9 +24,7 @@ class MrEko::Song < Sequel::Model
 
   # Return the file path of the EN fingerprint JSON file
   def self.fp_location(md5)
-    target = File.join(MrEko::HOME_DIR, 'fingerprints')
-    Dir.mkdir(target) unless File.exists?(target)
-    File.expand_path File.join(target, "#{md5}.json")
+    File.expand_path File.join(MrEko::FINGERPRINTS_DIR, "#{md5}.json")
   end
 
   # Use the platform-specific binary.
@@ -62,22 +61,23 @@ class MrEko::Song < Sequel::Model
     if fingerprint_json_data.keys.include?('error')
       analysis, profile = get_datapoints_by_filename(filename)
     else
-      puts "Identifying with ENMFP code"
+      log "Identifying with ENMFP code"
       identify_options = {:code => fingerprint_data}
       identify_options[:artist]   = fingerprint_json_data.metadata.artist  if fingerprint_json_data.metadata.artist
       identify_options[:title]    = fingerprint_json_data.metadata.title   if fingerprint_json_data.metadata.title
       identify_options[:release]  = fingerprint_json_data.metadata.release if fingerprint_json_data.metadata.release
       profile = MrEko.nest.song.identify(identify_options)
 
-      if profile.songs.empty? 
+      if profile.songs.empty?
         # ENMFP wasn't recognized, so upload.
+        print " -- "
         analysis, profile = get_datapoints_by_filename(filename)
       else
         begin
           profile = profile.songs.first
           analysis = MrEko.nest.song.profile(:id => profile.id, :bucket => 'audio_summary').songs.first.audio_summary
         rescue Exception => e
-          puts "Issues using ENMP data, uploading \"(#{e})\""
+          log "Issues using ENMP data, uploading \"(#{e})\""
           analysis, profile = get_datapoints_by_filename(filename)
         end
       end

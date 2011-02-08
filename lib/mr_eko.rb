@@ -9,15 +9,19 @@ require "hashie"
 require "digest/md5"
 require "echonest"
 
+STDOUT.sync = true
+
 EKO_ENV = ENV['EKO_ENV'] || 'development'
 Sequel.default_timezone = :utc
 
 module MrEko
-  VERSION = '0.2.0'
+  VERSION = '0.2.1'
   USER_DIR = File.join(ENV['HOME'], ".mreko")
+  FINGERPRINTS_DIR = File.join(USER_DIR, 'fingerprints')
   HOME_DIR = File.join(File.dirname(__FILE__), '..')
 
   class << self
+    attr_accessor :logger
 
     def env
       EKO_ENV
@@ -37,8 +41,14 @@ module MrEko
 
     def setup!
       @logger ||= Logger.new(STDOUT)
+      setup_directories!
       setup_db!
       setup_echonest!
+    end
+
+    def setup_directories!
+      Dir.mkdir(USER_DIR) unless File.directory?(USER_DIR)
+      Dir.mkdir(FINGERPRINTS_DIR) unless File.directory?(FINGERPRINTS_DIR)
     end
 
     def setup_db!
@@ -67,6 +77,7 @@ end
 
 MrEko.setup!
 
+require "lib/mr_eko/core"
 require "lib/mr_eko/presets"
 require "lib/mr_eko/playlist"
 require "lib/mr_eko/song"
