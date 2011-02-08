@@ -20,4 +20,4 @@ Requirements:
 
 Notes:
 ------
-MrEko will make an audio fingerprint of a music file and attempt to use it to identify the song.  This is faster but not always possible (due to Echonest limitations) so some songs must be uploaded to Echonest.  This means that scanning a large, somewhat eclectic library could take a good while.
+MrEko will make an audio fingerprint of a music file and attempt to use it to identify the song.  This is faster but not always successful (due to Echonest limitations) so some songs must be uploaded to Echonest.  This means that scanning a large and/or somewhat eclectic library **could take a good while**.
