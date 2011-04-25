@@ -13,8 +13,8 @@ Gem::Specification.new do |s|
   ## If your rubyforge_project name is different, then edit it and comment out
   ## the sub! line in the Rakefile
   s.name              = 'mr_eko'
-  s.version           = '0.2.4'
-  s.date              = '2011-02-08'
+  s.version           = '0.2.5'
+  s.date              = '2011-04-24'
   s.rubyforge_project = 'mr_eko'
 
   ## Make sure your summary is short. The description may be as long
@@ -49,6 +49,7 @@ Gem::Specification.new do |s|
   s.add_dependency('sqlite3-ruby', "~> 1.3")
   s.add_dependency('hashie')
   s.add_dependency('httpclient', "~> 2.1")
+  s.add_dependency('bassnode-ruby-echonest')
   s.add_dependency('json', "= 1.4.6")
 
   ## List your development dependencies here. Development dependencies are

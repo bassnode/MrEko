@@ -41,6 +41,7 @@ class MrEko::Song < Sequel::Model
 
   # Returns the analysis and profile data from Echonest for the given track.
   def self.get_datapoints_by_filename(filename)
+    log "Uploading data to EN for analysis"
     analysis = MrEko.nest.track.analysis(filename)
     profile  = MrEko.nest.track.profile(:md5 => MrEko.md5(filename)).body.track
 
@@ -56,28 +57,24 @@ class MrEko::Song < Sequel::Model
     fingerprint_data = enmfp_data(filename, md5)
     fingerprint_json_data = Hashie::Mash.new(JSON.parse(fingerprint_data).first)
 
-    if fingerprint_json_data.keys.include?('error')
-      analysis, profile = get_datapoints_by_filename(filename)
-    else
-      log "Identifying with ENMFP code"
-      identify_options = {:code => fingerprint_data}
-      identify_options[:artist]   = fingerprint_json_data.metadata.artist  if fingerprint_json_data.metadata.artist
-      identify_options[:title]    = fingerprint_json_data.metadata.title   if fingerprint_json_data.metadata.title
-      identify_options[:release]  = fingerprint_json_data.metadata.release if fingerprint_json_data.metadata.release
-      profile = MrEko.nest.song.identify(identify_options)
+    unless fingerprint_json_data.keys.include?('error')
+      begin
+        log "Identifying with ENMFP code"
 
-      if profile.songs.empty? 
-        # ENMFP wasn't recognized, so upload.
-        log "ENMP returned nothing, uploading"
+        identify_options = {:code => fingerprint_data}
+        identify_options[:artist]   = fingerprint_json_data.metadata.artist  if fingerprint_json_data.metadata.artist
+        identify_options[:title]    = fingerprint_json_data.metadata.title   if fingerprint_json_data.metadata.title
+        identify_options[:release]  = fingerprint_json_data.metadata.release if fingerprint_json_data.metadata.release
+
+        profile = MrEko.nest.song.identify(identify_options)
+
+        raise "ENMP returned nothing" if profile.songs.empty?
+
+        profile = profile.songs.first
+        analysis = MrEko.nest.song.profile(:id => profile.id, :bucket => 'audio_summary').songs.first.audio_summary
+      rescue Exception => e
+        log "Issues using ENMP data \"(#{e})\""
         analysis, profile = get_datapoints_by_filename(filename)
-      else
-        begin
-          profile = profile.songs.first
-          analysis = MrEko.nest.song.profile(:id => profile.id, :bucket => 'audio_summary').songs.first.audio_summary
-        rescue Exception => e
-          log "Issues using ENMP data, uploading \"(#{e})\""
-          analysis, profile = get_datapoints_by_filename(filename)
-        end
       end
     end
 
