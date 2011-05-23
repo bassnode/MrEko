@@ -6,9 +6,14 @@ require 'test/unit'
 require 'shoulda'
 require 'mocha'
 require "mr_eko"
+require "ruby-debug"
 
 require 'sequel/extensions/migration'
 Sequel::Migrator.apply(MrEko.connection, File.join(File.dirname(__FILE__), "..", "db", "migrate"))
+# Clear the tables out
+(MrEko.connection.tables - [:schema_info]).each do |table|
+  MrEko.connection.run "DELETE FROM #{table}"
+end
 
 class Test::Unit::TestCase
 

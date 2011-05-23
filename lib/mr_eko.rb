@@ -15,13 +15,13 @@ EKO_ENV = ENV['EKO_ENV'] || 'development'
 Sequel.default_timezone = :utc
 
 module MrEko
-  VERSION = '0.2.5'
+  VERSION = '0.2.6'
   USER_DIR = File.join(ENV['HOME'], ".mreko")
   FINGERPRINTS_DIR = File.join(USER_DIR, 'fingerprints')
   LOG_DIR = File.join(USER_DIR, 'logs')
   HOME_DIR = File.join(File.dirname(__FILE__), '..')
 
-  MODES = %w(minor major)
+  MODES = %w(minor major).freeze
   CHROMATIC_SCALE = %w(C C# D D# E F F# G G# A A# B).freeze
 
   class << self
@@ -85,7 +85,7 @@ module MrEko
 
     # Takes 'minor' or 'major' and returns its integer representation.
     def mode_lookup(mode)
-      MODES.index(mode.downcase)
+      MODES.index(mode.to_s.downcase)
     end
 
     # Takes a chromatic key (eg: G#) and returns its integer representation.
@@ -103,7 +103,9 @@ end
 
 MrEko.setup!
 
+require "lib/mr_eko/ext/numeric"
 require "lib/mr_eko/core"
 require "lib/mr_eko/presets"
 require "lib/mr_eko/playlist"
+require "lib/mr_eko/timed_playlist"
 require "lib/mr_eko/song"

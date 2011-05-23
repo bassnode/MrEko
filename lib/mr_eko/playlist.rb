@@ -13,16 +13,18 @@ class MrEko::Playlist < Sequel::Model
   # <tt>options</tt> should be finder options you pass to Song plus (optionally) :name.
   def self.create_from_options(options)
     # TODO: Is a name (or persisting) even necessary?
-    pl = create(:name => options.delete(:name) || "Playlist #{rand(10000)}")
-    prepare_options!(options)
+    MrEko.connection.transaction do
+      pl = create(:name => options.delete(:name) || "Playlist #{rand(10000)}")
+      prepare_options!(options)
 
-    songs = MrEko::Song.where(options).all
-    if songs.size > 0
-      songs.each{ |song| pl.add_song(song) }
-      pl.save
-    else
-      pl.delete # TODO: Look into not creating Playlist in the 1st place
-      raise NoSongsError.new("No songs match that criteria!")
+      songs = MrEko::Song.where(options).all
+      if songs.size > 0
+        songs.each{ |song| pl.add_song(song) }
+        pl.save
+      else
+        # pl.delete # TODO: Look into not creating Playlist in the 1st place
+        raise NoSongsError.new("No songs match that criteria!")
+      end
     end
   end
 

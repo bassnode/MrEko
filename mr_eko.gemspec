@@ -13,8 +13,8 @@ Gem::Specification.new do |s|
   ## If your rubyforge_project name is different, then edit it and comment out
   ## the sub! line in the Rakefile
   s.name              = 'mr_eko'
-  s.version           = '0.2.5'
-  s.date              = '2011-04-24'
+  s.version           = '0.2.6'
+  s.date              = '2011-05-23'
   s.rubyforge_project = 'mr_eko'
 
   ## Make sure your summary is short. The description may be as long
@@ -57,7 +57,8 @@ Gem::Specification.new do |s|
   s.add_development_dependency('mocha', "= 0.9.8")
   s.add_development_dependency('shoulda', "~> 2.11")
   s.add_development_dependency('test-unit', "~> 2.1")
-  s.add_development_dependency("ruby-debug", "~> 0.10.3")
+  s.add_development_dependency("ruby-debug")
+  s.add_development_dependency("autotest")
 
   ## Leave this section as-is. It will be automatically generated from the
   ## contents of your Git repository via the gemspec task. DO NOT REMOVE
@@ -82,13 +83,16 @@ Gem::Specification.new do |s|
     ext/enmfp/codegen.windows.exe
     lib/mr_eko.rb
     lib/mr_eko/core.rb
+    lib/mr_eko/ext/numeric.rb
     lib/mr_eko/playlist.rb
     lib/mr_eko/presets.rb
     lib/mr_eko/song.rb
+    lib/mr_eko/timed_playlist.rb
     mr_eko.gemspec
     test/mr_eko_test.rb
     test/playlist_test.rb
     test/test.rb
+    test/timed_playlist_test.rb
   ]
   # = MANIFEST =
 
