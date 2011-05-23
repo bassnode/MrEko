@@ -48,7 +48,6 @@ class MrEko::Song < Sequel::Model
     return [analysis, profile]
   end
 
-  # TODO: Cleanup - This method is prety ugly now.
   def self.create_from_file!(filename)
     md5 = MrEko.md5(filename)
     existing = where(:md5 => md5).first

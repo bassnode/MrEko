@@ -59,14 +59,16 @@ class MrEko::Playlist < Sequel::Model
     raise ArgumentError.new("Format must be one of #{FORMATS.join(', ')}") unless FORMATS.include? format
 
     case format
-    when :pls
-      create_pls
+    when :text
+      create_text
     when :m3u
       create_m3u
     else
-     create_text
+     create_pls
     end
   end
+
+  private
 
   # Returns a text representation of the Playlist.
   def create_text

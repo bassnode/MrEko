@@ -58,7 +58,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency('shoulda', "~> 2.11")
   s.add_development_dependency('test-unit', "~> 2.1")
   s.add_development_dependency("ruby-debug", "~> 0.10.3")
-  
+
   ## Leave this section as-is. It will be automatically generated from the
   ## contents of your Git repository via the gemspec task. DO NOT REMOVE
   ## THE MANIFEST COMMENTS, they are used as delimiters by the task.

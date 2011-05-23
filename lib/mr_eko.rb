@@ -18,6 +18,7 @@ module MrEko
   VERSION = '0.2.5'
   USER_DIR = File.join(ENV['HOME'], ".mreko")
   FINGERPRINTS_DIR = File.join(USER_DIR, 'fingerprints')
+  LOG_DIR = File.join(USER_DIR, 'logs')
   HOME_DIR = File.join(File.dirname(__FILE__), '..')
 
   MODES = %w(minor major)
@@ -43,15 +44,22 @@ module MrEko
     end
 
     def setup!
-      @logger ||= Logger.new(STDOUT)
       setup_directories!
+      setup_logger!
       setup_db!
       setup_echonest!
+    end
+
+    # Output to STDOUT in development, otherwise, save to logfile
+    def setup_logger!
+      out = env == 'development' ? STDOUT : File.join(LOG_DIR, "#{env}.log")
+      @logger ||= Logger.new(out)
     end
 
     def setup_directories!
       Dir.mkdir(USER_DIR) unless File.directory?(USER_DIR)
       Dir.mkdir(FINGERPRINTS_DIR) unless File.directory?(FINGERPRINTS_DIR)
+      Dir.mkdir(LOG_DIR) unless File.directory?(LOG_DIR)
     end
 
     def setup_db!
