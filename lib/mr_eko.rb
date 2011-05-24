@@ -73,7 +73,7 @@ module MrEko
     end
 
     def db_name
-      env == 'test' ? 'db/eko_test.db' : 'db/eko.db'
+      env == 'test' ? File.join('db', 'eko_test.db') : File.join('db', 'eko.db')
     end
 
     def api_key
@@ -97,6 +97,25 @@ module MrEko
     def key_letter(key)
       CHROMATIC_SCALE[key]
     end
+
+    # Use the platform-specific binary.
+    def enmfp_binary
+      case ruby_platform
+      when /darwin/
+        'codegen.Darwin'
+      when /686/
+        'codegen.Linux-i686'
+      when /x86/
+        'codegen.Linux-x86_64'
+      else
+        'codegen.windows.exe'
+      end
+    end
+
+    def ruby_platform
+      RUBY_PLATFORM
+    end
+
   end
 end
 
