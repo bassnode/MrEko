@@ -1,4 +1,4 @@
 source "http://rubygems.org"
 
-#gem "ruby-echonest", :path => "../ruby-echonest"
+# gem "bassnode-ruby-echonest", :path => "../ruby-echonest"
 gemspec

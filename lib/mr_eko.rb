@@ -8,6 +8,10 @@ require "logger"
 require "hashie"
 require "digest/md5"
 require "echonest"
+begin
+  require 'ruby-debug'
+rescue LoadError
+end
 
 STDOUT.sync = true
 
