@@ -1,6 +1,7 @@
 class SongTest < Test::Unit::TestCase
 
   TEST_MP3 = File.join(File.dirname(__FILE__), 'data', 'they_want_a_test.mp3')
+  TAGLESS_MP3 = File.join(File.dirname(__FILE__), 'data', 'tagless.mp3')
 
   def enmfp_data_stub(overrides={})
     opts = {
@@ -31,12 +32,12 @@ class SongTest < Test::Unit::TestCase
   context 'create_from_file!' do
 
     should 'try cataloging via ENMFP by default' do
-      MrEko::Song.expects(:catalog_via_enmfp).with(TEST_MP3)
+      MrEko::Song.expects(:catalog_via_enmfp).with(TEST_MP3, kind_of(Hash))
       MrEko::Song.create_from_file!(TEST_MP3)
     end
 
     should 'use tags if directed' do
-      MrEko::Song.expects(:catalog_via_tags).with(TEST_MP3)
+      MrEko::Song.expects(:catalog_via_tags).with(TEST_MP3, kind_of(Hash))
       MrEko::Song.create_from_file!(TEST_MP3, :tags)
     end
 
@@ -45,6 +46,8 @@ class SongTest < Test::Unit::TestCase
       stub = MrEko::Song.new
       MrEko::Song.expects(:where).with(:md5 => md5).returns( [stub] )
 
+      MrEko::Song.expects(:catalog_via_enmfp).never
+      MrEko::Song.expects(:catalog_via_tags).never
       assert_equal stub, MrEko::Song.create_from_file!(TEST_MP3)
     end
   end
@@ -69,7 +72,7 @@ class SongTest < Test::Unit::TestCase
       }
       MrEko::Song.stubs(:enmfp_data).returns(stub_data)
       Echonest::ApiMethods::Song.any_instance.expects(:identify).with(id_opts).returns(empty_profile_stub)
-      MrEko::Song.expects(:get_datapoints_by_upload).returns([stub_everything, stub_everything])
+      MrEko::Song.expects(:get_datapoints_by_upload).returns([stub_everything, stub_everything(:id => 'whatever')])
       MrEko::Song.catalog_via_enmfp(TEST_MP3)
     end
 
@@ -86,6 +89,40 @@ class SongTest < Test::Unit::TestCase
 
       assert_difference 'MrEko::Song.count' do
         MrEko::Song.catalog_via_enmfp(TEST_MP3)
+      end
+    end
+  end
+
+  context 'catalog_via_tags' do
+
+    context 'for a mp3 with no useful tag information' do
+
+      setup do
+        @mp3 = MrEko::Song.parse_id3_tags(TAGLESS_MP3)
+        assert_nil @mp3.artist
+        assert_nil @mp3.title
+      end
+
+      should 'return nil' do
+        assert_nil MrEko::Song.catalog_via_tags(TAGLESS_MP3)
+      end
+    end
+
+    context 'for a mp3 with the required tag information' do
+
+      setup do
+        @mp3 = MrEko::Song.parse_id3_tags(TEST_MP3)
+        assert_not_nil @mp3.artist
+        assert_not_nil @mp3.title
+      end
+
+      should 'create a Song' do
+        songs_stub = [stub(:audio_summary => stub_everything, :artist => @mp3.artist, :title => @mp3.title, :id => 'xxx')]
+        Echonest::ApiMethods::Song.any_instance.expects(:search).returns(stub(:songs => songs_stub))
+
+        assert_difference 'MrEko::Song.count' do
+          MrEko::Song.catalog_via_tags(TEST_MP3)
+        end
       end
     end
   end

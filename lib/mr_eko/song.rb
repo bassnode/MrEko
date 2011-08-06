@@ -3,6 +3,8 @@ class MrEko::Song < Sequel::Model
   plugin :validation_helpers
   many_to_many :playlists
 
+  REQUIRED_ID3_TAGS = [:artist, :title]
+
   class EnmfpError < Exception; end
 
   def self.create_from_file!(filename, analysis_type = :enmfp)
@@ -12,15 +14,15 @@ class MrEko::Song < Sequel::Model
 
     case analysis_type
     when :enmfp
-      catalog_via_enmfp(filename)
+      catalog_via_enmfp(filename, :md5 => md5)
     when :tags
-      catalog_via_tags(filename)
+      catalog_via_tags(filename, :md5 => md5)
     end
 
   end
 
-  def self.catalog_via_enmfp(filename)
-    md5 = MrEko.md5(filename)
+  def self.catalog_via_enmfp(filename, opts={})
+    md5 = opts[:md5] || MrEko.md5(filename)
     fingerprint_json = enmfp_data(filename, md5)
 
     if fingerprint_json.keys.include?('error')
@@ -72,8 +74,47 @@ class MrEko::Song < Sequel::Model
     end
   end
 
-  def self.catalog_via_tags(filename)
-    puts 'Coming soon'
+  def self.parse_id3_tags(filename)
+    ID3Lib::Tag.new(filename, ID3Lib::V_ALL)
+  end
+
+  def self.catalog_via_tags(filename, opts={})
+    tags = parse_id3_tags(filename)
+    return unless has_required_tags? tags
+
+    md5 = opts[:md5] || MrEko.md5(filename)
+    analysis = MrEko.nest.song.search(:artist => tags.artist,
+                                      :title => tags.title,
+                                      :bucket => 'audio_summary',
+                                      :limit => 1).songs.first
+    create do |song|
+      song.filename       = File.expand_path(filename)
+      song.md5            = md5
+      # song.code           = fingerprint_json.code
+      song.tempo          = analysis.audio_summary.tempo
+      song.duration       = analysis.audio_summary.duration
+      # song.fade_in        = analysis.end_of_fade_in
+      # song.fade_out       = analysis.start_of_fade_out
+      song.key            = analysis.audio_summary.key
+      song.mode           = analysis.audio_summary.mode
+      song.loudness       = analysis.audio_summary.loudness
+      song.time_signature = analysis.audio_summary.time_signature
+      song.echonest_id    = analysis.id
+      # song.bitrate        = profile.bitrate
+      song.title          = tags.title
+      song.artist         = tags.artist
+      # song.album          = ??
+      song.danceability   = analysis.audio_summary.danceability
+      song.energy         = analysis.audio_summary.energy
+    end
+  end
+
+  def self.has_required_tags?(tags)
+    found = REQUIRED_ID3_TAGS.inject([]) do |present, meth|
+      present << tags.send(meth)
+    end
+
+    found.compact.size == REQUIRED_ID3_TAGS.size ? true : false
   end
 
   # Using the Echonest Musical Fingerprint lib in the hopes

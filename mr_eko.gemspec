@@ -13,8 +13,8 @@ Gem::Specification.new do |s|
   ## If your rubyforge_project name is different, then edit it and comment out
   ## the sub! line in the Rakefile
   s.name              = 'mr_eko'
-  s.version           = '0.2.6'
-  s.date              = '2011-05-23'
+  s.version           = '0.2.7'
+  s.date              = '2011-08-05'
   s.rubyforge_project = 'mr_eko'
 
   ## Make sure your summary is short. The description may be as long
@@ -51,6 +51,7 @@ Gem::Specification.new do |s|
   s.add_dependency('httpclient', "~> 2.1")
   s.add_dependency('bassnode-ruby-echonest')
   s.add_dependency('json', "= 1.4.6")
+  s.add_dependency('id3lib-ruby')
 
   ## List your development dependencies here. Development dependencies are
   ## those that are only needed during development
@@ -91,6 +92,7 @@ Gem::Specification.new do |s|
     mr_eko.gemspec
     test/mr_eko_test.rb
     test/playlist_test.rb
+    test/song_test.rb
     test/test.rb
     test/timed_playlist_test.rb
   ]
