@@ -1,3 +1,4 @@
+# TODO: Refactor this so everything's not in class methods
 class MrEko::Song < Sequel::Model
   include MrEko::Core
   plugin :validation_helpers
@@ -7,16 +8,15 @@ class MrEko::Song < Sequel::Model
 
   class EnmfpError < Exception; end
 
-  def self.create_from_file!(filename, analysis_type = :enmfp)
+  def self.create_from_file!(filename)
     md5 = MrEko.md5(filename)
     existing = where(:md5 => md5).first
     return existing unless existing.nil?
 
-    case analysis_type
-    when :enmfp
+    if song = catalog_via_tags(filename, :md5 => md5)
+      song
+    else
       catalog_via_enmfp(filename, :md5 => md5)
-    when :tags
-      catalog_via_tags(filename, :md5 => md5)
     end
 
   end
@@ -75,6 +75,7 @@ class MrEko::Song < Sequel::Model
   end
 
   def self.parse_id3_tags(filename)
+    log "Parsing ID3 tags"
     ID3Lib::Tag.new(filename, ID3Lib::V_ALL)
   end
 
@@ -90,22 +91,24 @@ class MrEko::Song < Sequel::Model
     create do |song|
       song.filename       = File.expand_path(filename)
       song.md5            = md5
-      # song.code           = fingerprint_json.code
       song.tempo          = analysis.audio_summary.tempo
       song.duration       = analysis.audio_summary.duration
-      # song.fade_in        = analysis.end_of_fade_in
-      # song.fade_out       = analysis.start_of_fade_out
       song.key            = analysis.audio_summary.key
       song.mode           = analysis.audio_summary.mode
       song.loudness       = analysis.audio_summary.loudness
       song.time_signature = analysis.audio_summary.time_signature
       song.echonest_id    = analysis.id
-      # song.bitrate        = profile.bitrate
       song.title          = tags.title
       song.artist         = tags.artist
-      # song.album          = ??
       song.danceability   = analysis.audio_summary.danceability
       song.energy         = analysis.audio_summary.energy
+      # XXX: Won't have these from tags - worth getting from EN?
+      # song.code           = fingerprint_json.code
+      # song.album          = album
+      # song.fade_in        = analysis.end_of_fade_in
+      # song.fade_out       = analysis.start_of_fade_out
+      # XXX: ID3Lib doesn't return these - worth parsing?
+      # song.bitrate        =  profile.bitrate
     end
   end
 

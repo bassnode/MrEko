@@ -13,7 +13,7 @@ class SongTest < Test::Unit::TestCase
         'title'        => 'Ross Ross Ross',
         'release'      => 'Total',
         'genre'        => 'Electronic',
-        'filename'     => '/Users/you/Music/sebastian-ross_ross_ross,mp3',
+        'filename'     => '/Users/you/Music/sebastian-ross_ross_ross.mp3',
         'bitrate'      => 320,
         'sample_rate'  => 44100,
         'codegen_time' => 9.221,
@@ -31,23 +31,25 @@ class SongTest < Test::Unit::TestCase
 
   context 'create_from_file!' do
 
-    should 'try cataloging via ENMFP by default' do
-      MrEko::Song.expects(:catalog_via_enmfp).with(TEST_MP3, kind_of(Hash))
+    should 'catalog from tags by default' do
+      MrEko::Song.expects(:catalog_via_tags).with(TEST_MP3, kind_of(Hash)).returns(MrEko::Song.new)
       MrEko::Song.create_from_file!(TEST_MP3)
     end
 
-    should 'use tags if directed' do
-      MrEko::Song.expects(:catalog_via_tags).with(TEST_MP3, kind_of(Hash))
-      MrEko::Song.create_from_file!(TEST_MP3, :tags)
+    should 'try cataloging via ENMFP when tags dont work' do
+      MrEko::Song.expects(:catalog_via_tags).with(TEST_MP3, kind_of(Hash)).returns(nil)
+      MrEko::Song.expects(:catalog_via_enmfp).with(TEST_MP3, kind_of(Hash)).returns(MrEko::Song.new)
+      MrEko::Song.create_from_file!(TEST_MP3)
     end
 
     should 'not try cataloging if we have it stored already' do
-      md5 = MrEko.md5(TEST_MP3)
+      md5  = MrEko.md5(TEST_MP3)
       stub = MrEko::Song.new
-      MrEko::Song.expects(:where).with(:md5 => md5).returns( [stub] )
 
+      MrEko::Song.expects(:where).with(:md5 => md5).returns( [stub] )
       MrEko::Song.expects(:catalog_via_enmfp).never
       MrEko::Song.expects(:catalog_via_tags).never
+
       assert_equal stub, MrEko::Song.create_from_file!(TEST_MP3)
     end
   end
