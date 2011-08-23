@@ -29,6 +29,6 @@ Fixed memory leak in FFT routine
 Use Accelerate on iOS 4
 "Too few events detected" no longer throws exception but returns empty codestring
 
-
-
-
+3.16 Aug 18 2011
+Compile without debug symbols
+OSX version is now 32/64bit fat binary, compatible with OSX 10.5-up
