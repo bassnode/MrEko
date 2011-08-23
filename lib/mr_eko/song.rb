@@ -21,6 +21,14 @@ class MrEko::Song < Sequel::Model
 
   end
 
+  # Run local analysis (ENMFP) on the passed file, send that identifier code
+  # to EN and store the returned details in our DB.
+  # If the local analysis fails, upload the MP3 to EN for server-side analysis.
+  #
+  # @param [String] location of the audio file
+  # @param [Hash] opts
+  # @option opts [String] :md5 pre-calculated MD5 of file
+  # @return [MrEko::Song] the created Song
   def self.catalog_via_enmfp(filename, opts={})
     md5 = opts[:md5] || MrEko.md5(filename)
     fingerprint_json = enmfp_data(filename, md5)
