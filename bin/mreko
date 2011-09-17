@@ -52,6 +52,9 @@ def parse_options
       options[:format] = format
     end
 
+    opts.on("-t", "--tags-only", "Only perform lookups using ID3 tags (no analyzing)") do
+      options[:tags_only] = true
+    end
 
     opts.separator ""
     opts.separator "Common options:"
@@ -68,14 +71,15 @@ def parse_options
 end
 
 
+options = parse_options
+
 case ARGV[0]
 when 'scan'
   ARGV.shift
   ARGV.each do |file|
-    MrEko::Song.create_from_file!(file)
+    MrEko::Song.create_from_file!(file, options)
   end
 when 'playlist'
-  options = parse_options
   format = options.delete(:format)
   playlist = MrEko::Playlist.create_from_options(options)
   puts playlist.output(format)

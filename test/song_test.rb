@@ -52,6 +52,14 @@ class SongTest < Test::Unit::TestCase
 
       assert_equal stub, MrEko::Song.create_from_file!(TEST_MP3)
     end
+
+    should 'not atempt to catalog via ENMFP if the tags_only option is passed in' do
+      MrEko::Song.expects(:catalog_via_tags).with(TEST_MP3, kind_of(Hash)).returns(nil)
+      MrEko::Song.expects(:catalog_via_enmfp).never
+
+      MrEko::Song.create_from_file!(TEST_MP3, :tags_only => true)
+
+    end
   end
 
 

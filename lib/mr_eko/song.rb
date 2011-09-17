@@ -8,14 +8,22 @@ class MrEko::Song < Sequel::Model
 
   class EnmfpError < Exception; end
 
-  def self.create_from_file!(filename)
+  # A wrapper which gets called by the bin file.
+  # By default will try to extract the needed song info from the ID3 tags and
+  # if fails, will analyze via ENMFP/upload.
+  #
+  # @param [String] file path of the MP3
+  # @param [Hash] options hash
+  # @option options [Boolean] :tags_only If passed, skip ENMFP
+  # @return [MrEko::Song]
+  def self.create_from_file!(filename, opts={})
     md5 = MrEko.md5(filename)
     existing = where(:md5 => md5).first
     return existing unless existing.nil?
 
     if song = catalog_via_tags(filename, :md5 => md5)
       song
-    else
+    elsif !opts[:tags_only]
       catalog_via_enmfp(filename, :md5 => md5)
     end
 
@@ -87,6 +95,10 @@ class MrEko::Song < Sequel::Model
     ID3Lib::Tag.new(filename, ID3Lib::V_ALL)
   end
 
+  # Uses ID3 tags to query Echonest and then store the resultant data.
+  #
+  # @see Song.catalog_via_enmfp for options
+  # @return [MrEko::Song]
   def self.catalog_via_tags(filename, opts={})
     tags = parse_id3_tags(filename)
     return unless has_required_tags? tags
@@ -130,6 +142,10 @@ class MrEko::Song < Sequel::Model
 
   # Using the Echonest Musical Fingerprint lib in the hopes
   # of sidestepping the mp3 upload process.
+  #
+  # @param [String] file path of the MP3
+  # @param [String] MD5 hash of the file
+  # @return [Hash] data from the ENMFP process
   def self.enmfp_data(filename, md5)
     unless File.exists?(fp_location(md5))
       log 'Running ENMFP'
@@ -143,6 +159,9 @@ class MrEko::Song < Sequel::Model
   end
 
   # Returns the analysis and profile data from Echonest for the given track.
+  #
+  # @param [String] file path of the MP3
+  # @return [Array] Analysis and profile data from EN
   def self.get_datapoints_by_upload(filename)
     log "Uploading data to EN for analysis"
     analysis = MrEko.nest.track.analysis(filename)
@@ -163,6 +182,9 @@ class MrEko::Song < Sequel::Model
   end
 
   # Return the file path of the EN fingerprint JSON file
+  #
+  # @param [String] MD5 hash of the file
+  # @return [String] full path of file with passed MP5
   def self.fp_location(md5)
     File.expand_path File.join(MrEko::FINGERPRINTS_DIR, "#{md5}.json")
   end
