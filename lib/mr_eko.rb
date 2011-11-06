@@ -128,6 +128,7 @@ end
 MrEko.setup!
 
 require "lib/mr_eko/ext/numeric"
+require "lib/mr_eko/ext/object"
 require "lib/mr_eko/core"
 require "lib/mr_eko/presets"
 require "lib/mr_eko/playlist"

@@ -90,10 +90,16 @@ class MrEko::Song < Sequel::Model
     end
   end
 
+  # Parses the file's ID3 tags and converts and strange encoding.
+  #
+  # @param [String] The file path
+  # @return [ID3Lib::Tag]
   def self.parse_id3_tags(filename)
     log "Parsing ID3 tags"
-    ID3Lib::Tag.new(filename, ID3Lib::V_ALL)
+
+    clean_tags ID3Lib::Tag.new(filename, ID3Lib::V_ALL)
   end
+
 
   # Uses ID3 tags to query Echonest and then store the resultant data.
   #
@@ -129,7 +135,7 @@ class MrEko::Song < Sequel::Model
       # song.fade_out       = analysis.start_of_fade_out
       # XXX: ID3Lib doesn't return these - worth parsing?
       # song.bitrate        =  profile.bitrate
-    end
+    end if analysis
   end
 
   def self.has_required_tags?(tags)
@@ -189,6 +195,23 @@ class MrEko::Song < Sequel::Model
     File.expand_path File.join(MrEko::FINGERPRINTS_DIR, "#{md5}.json")
   end
 
+  # @param [ID3Lib::Tag]
+  # @return [ID3Lib::Tag]
+  def self.clean_tags(tags)
+    ic = Iconv.new("ascii//IGNORE//TRANSLIT", "utf-16")
+
+    REQUIRED_ID3_TAGS.each do |rt|
+      decoded = begin
+        ic.iconv(tags.send(rt))
+      rescue Iconv::InvalidCharacter
+        tags.send(rt)
+      end
+      decoded = nil if decoded.blank?
+      tags.send("#{rt}=", decoded)
+    end
+
+    tags
+  end
 end
 
 MrEko::Song.plugin :timestamps

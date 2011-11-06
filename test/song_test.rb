@@ -136,4 +136,23 @@ class SongTest < Test::Unit::TestCase
       end
     end
   end
+
+  context 'cleaning funky ID3 tags' do
+
+    should "decode iTunes' crazy tags" do
+      dm = Iconv.conv('UTF-16', 'LATIN1', 'Dead Meadow')
+      tag_stub = OpenStruct.new(:artist => dm, :title => 'Good Moaning')
+      ID3Lib::Tag.expects(:new).once.returns(tag_stub)
+      parsed_tags = MrEko::Song.parse_id3_tags(TEST_MP3)
+
+      assert_equal "Dead Meadow", parsed_tags.artist
+    end
+
+    should "not blow up when there isn't any crazy encoding" do
+      tag_stub = OpenStruct.new(:artist => 'Dead Meadow', :title => 'Good Moaning')
+      ID3Lib::Tag.expects(:new).once.returns(tag_stub)
+
+      assert_nothing_raised{ MrEko::Song.parse_id3_tags(TEST_MP3) }
+    end
+  end
 end
