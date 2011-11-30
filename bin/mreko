@@ -13,10 +13,11 @@ def parse_options
   options = { :format => :text }
 
   OptionParser.new do |opts|
-    opts.banner = "Usage: #{$0} [options]"
+    opts.banner = "Usage: #{$0} scan|playlist [options]"
 
     opts.separator ""
-    opts.separator "Specific options:"
+    opts.separator "Playlist options:"
+
     opts.on("-p", "--preset NAME", String, "Select a preset.  Options are (#{MrEko::Presets::FACTORY.keys.join(', ')})") do |preset|
       options[:preset] = preset
     end
@@ -65,7 +66,6 @@ def parse_options
     end
 
     opts.separator ""
-    opts.separator "Common options:"
 
     # No argument, shows at tail.  This will print an options summary.
     opts.on_tail("-h", "--help", "Show this message") do
@@ -84,7 +84,17 @@ options = parse_options
 case ARGV[0]
 when 'scan'
   ARGV.shift
-  ARGV.each do |file|
+
+  files = ARGV.map do |arg|
+    if File.directory?(arg)
+      Dir.glob("#{arg}/**/*.mp3")
+    else
+      File.expand_path arg
+    end
+  end.flatten
+
+  puts "Found #{files.length} MP3s to process..."
+  files.each do |file|
     MrEko::Song.create_from_file!(file, options)
   end
 when 'playlist'

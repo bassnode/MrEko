@@ -4,8 +4,11 @@ MrEko analyzes your music and lets you ask him in-depth questions about it.  He 
 
 Example:
 --------
-    # Scan all your music
-    mreko scan ~/Music/*.mp3
+    # Scan a directory, recursively:
+    mreko scan ~/Music/iTunes
+
+    # Scan a set of files
+    mreko scan jakob-semaphore.mp3 pelican-drought.mp3
 
     # Output a PLS playlist of fast, minor-key music
     mreko playlist --tempo '>120' --mode minor --format pls > rainy_day_suicidal_playlist.pls

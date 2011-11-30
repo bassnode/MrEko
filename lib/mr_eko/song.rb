@@ -196,8 +196,8 @@ class MrEko::Song < Sequel::Model
     File.expand_path File.join(MrEko::FINGERPRINTS_DIR, "#{md5}.json")
   end
 
-  # @param [ID3Lib::Tag]
-  # @return [ID3Lib::Tag]
+  # @param [Array<ID3Lib::Tag>]
+  # @return [Array<ID3Lib::Tag>]
   def self.clean_tags(tags)
     ic = Iconv.new("utf-8", "ucs-2")
 
