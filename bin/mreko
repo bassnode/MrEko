@@ -21,23 +21,31 @@ def parse_options
       options[:preset] = preset
     end
 
-    opts.on("-m", "--min-tempo BPM", Integer, "Specify minimum tempo") do |bpm|
-      options[:min_tempo] = bpm
+    opts.on("-t", "--tempo BPM", "Specify tempo") do |bpm|
+      options[:tempo] = bpm
     end
 
-    opts.on("-M", "--max-tempo BPM", Integer, "Specify maximum tempo") do |bpm|
-      options[:max_tempo] = bpm
-    end
-
-    opts.on("-t", "--time-sig SIG", Integer, "Specify time signature") do |ts|
+    opts.on("-s", "--time-sig SIG", Integer, "Specify time signature") do |ts|
       options[:time_signature] = ts
     end
 
-    opts.on("-l", "--max-length SEC", Integer, "Specify maximum song length (in seconds)") do |sec|
-      options[:max_duration] = sec
+    opts.on("-l", "--duration SEC", "Specify song length (in seconds)") do |sec|
+      options[:duration] = sec
     end
 
-    opts.on("-d", "--mode MODE", String, "Specify mode (minor or major)") do |mode|
+    opts.on("-d", "--danceability NUM", "Specify danceability (from 1 to 100)") do |num|
+      options[:danceability] = num
+    end
+
+    opts.on("-e", "--energy NUM", "Specify energy (from 1 to 100)") do |num|
+      options[:energy] = num
+    end
+
+    opts.on("-w", "--loudness NUM", "Specify loudness (from 1 to 100)") do |num|
+      options[:loudness] = num
+    end
+
+    opts.on("-o", "--mode MODE", String, "Specify mode (minor or major)") do |mode|
       unless MrEko::MODES.include?(mode)
         raise ArgumentError.new("Mode must be #{MrEko::MODES.join(' or ')}")
       end
@@ -52,7 +60,7 @@ def parse_options
       options[:format] = format
     end
 
-    opts.on("-t", "--tags-only", "Only perform lookups using ID3 tags (no analyzing)") do
+    opts.on("-x", "--tags-only", "Only perform lookups using ID3 tags (no analyzing)") do
       options[:tags_only] = true
     end
 

@@ -64,89 +64,77 @@ class PlaylistTest < Test::Unit::TestCase
     end
   end
 
-  context "prepare_options!" do
+  context "prepare_options" do
 
     context "when passed a preset option" do
 
       should "only use the presets' options, not the others passed" do
         opts = { :time_signature => 4, :preset => :gym }
-        MrEko::Playlist.prepare_options!(opts)
-        assert !opts.has_key?(:time_signature)
-        assert_equal MrEko::Presets::FACTORY[:gym][:tempo], opts[:tempo]
+        transformed = MrEko::Playlist.prepare_options(opts)
+
+        assert_nil transformed.detect{ |opt| opt.has_key?(:time_signature) }
+        assert_equal MrEko::Presets::FACTORY[:gym].detect{ |opt| opt.has_key?(:tempo) }[:tempo],
+                     transformed.detect{ |opt| opt.has_key?(:tempo) }[:tempo]
       end
     end
 
-    context "for tempo" do
+    context "transformation" do
 
-      should "not transform when tempo is a Range" do
-        opts = {:tempo => 160..180}
-        MrEko::Playlist.prepare_options!(opts)
-        assert_equal 160..180, opts[:tempo]
+      should "handle less-than sign" do
+        transformed = MrEko::Playlist.prepare_options({:duration => "<20"})
+        assert_equal "duration < 20".lit, transformed.last
       end
 
-      should "transform even when there aren't any passed tempo opts" do
-        opts = {:time_signature => 4}
-        MrEko::Playlist.prepare_options!(opts)
-        assert opts.has_key? :tempo
+      should "handle greater-than sign" do
+        transformed = MrEko::Playlist.prepare_options({:tempo => ">151"})
+        assert_equal "tempo > 151".lit, transformed.last
       end
 
-      should "remove min and max keys" do
-        opts = {:min_tempo => 100, :max_tempo => 200}
-        MrEko::Playlist.prepare_options!(opts)
-        assert !opts.has_key?(:min_tempo)
-        assert !opts.has_key?(:max_tempo)
+      should "handle basic assignment" do
+        transformed = MrEko::Playlist.prepare_options({:artist => "Radiohead"})
+        assert_equal( {:artist => "Radiohead"}, transformed.last )
       end
 
-      should "create a range with the passed min and max tempos" do
-        opts = {:min_tempo => 100, :max_tempo => 200}
-        MrEko::Playlist.prepare_options!(opts)
-        assert_equal 100..200, opts[:tempo]
+      context "percentage values" do
+        [:loudness, :energy, :danceability].each do |attribute|
+          should "translate #{attribute} into decimal form" do
+            transformed = MrEko::Playlist.prepare_options({attribute => 32})
+            assert_equal( {attribute => 0.32}, transformed.last )
+          end
+        end
       end
     end
 
-    context "for duration" do
-
-      should "not transform when duration is a Range" do
-        opts = {:duration => 200..2010}
-        MrEko::Playlist.prepare_options!(opts)
-        assert_equal 200..2010, opts[:duration]
+    context "defaults" do
+      should "be overridable" do
+        transformed = MrEko::Playlist.prepare_options({:tempo => 180})
+        assert_equal 180, transformed.detect{ |opt| opt.has_key?(:tempo) }[:tempo]
       end
 
-      should "transform even when there aren't any passed duration opts" do
-        opts = {:time_signature => 4}
-        MrEko::Playlist.prepare_options!(opts)
-        assert opts.has_key? :duration
+      should "be set for tempo" do
+        transformed = MrEko::Playlist.prepare_options({})
+        assert_equal 0..500, transformed.detect{ |opt| opt.has_key?(:tempo) }[:tempo]
       end
 
-      should "remove min and max keys" do
-        opts = {:min_duration => 100, :max_duration => 2000}
-        MrEko::Playlist.prepare_options!(opts)
-        assert !opts.has_key?(:min_duration)
-        assert !opts.has_key?(:max_duration)
-      end
-
-      should "create a range with the passed min and max durations" do
-        opts = {:min_duration => 100, :max_duration => 2000}
-        MrEko::Playlist.prepare_options!(opts)
-        assert_equal 100..2000, opts[:duration]
+      should "be set for duration" do
+        transformed = MrEko::Playlist.prepare_options({})
+        assert_equal 10..1200, transformed.detect{ |opt| opt.has_key?(:duration) }[:duration]
       end
     end
 
     context "for mode" do
 
       should "transform into numeric representation" do
-        opts = {:mode => 'minor'}
-        MrEko::Playlist.prepare_options!(opts)
-        assert_equal 0, opts[:mode]
+        transformed = MrEko::Playlist.prepare_options(:mode => 'minor')
+        assert_equal 0, transformed.detect{ |opt| opt.key?(:mode) }[:mode]
       end
     end
 
     context "for key" do
 
       should "transform into numeric representation" do
-        opts = {:key => 'C#'}
-        MrEko::Playlist.prepare_options!(opts)
-        assert_equal 1, opts[:key]
+        transformed = MrEko::Playlist.prepare_options(:key => 'C#')
+        assert_equal 1, transformed.detect{ |opt| opt.key?(:key) }[:key]
       end
     end
 

@@ -7,7 +7,9 @@ class MrEko::Playlist < Sequel::Model
 
   plugin :validation_helpers
   many_to_many :songs
-  FORMATS = [:pls, :m3u, :text]
+  FORMATS = [:pls, :m3u, :text].freeze
+  DEFAULT_OPTIONS = [ {:tempo => 0..500}, {:duration => 10..1200} ].freeze
+
 
   # Creates and returns a new Playlist from the passed <tt>options</tt>.
   # <tt>options</tt> should be finder options you pass to Song plus (optionally) :name.
@@ -15,7 +17,8 @@ class MrEko::Playlist < Sequel::Model
     # TODO: Is a name (or persisting) even necessary?
     MrEko.connection.transaction do
       pl = create(:name => options.delete(:name) || "Playlist #{rand(10000)}")
-      prepare_options!(options)
+      options = prepare_options(options)
+
 
       songs = MrEko::Song.where(options).all
       if songs.size > 0
@@ -23,36 +26,40 @@ class MrEko::Playlist < Sequel::Model
         pl.save
       else
         # pl.delete # TODO: Look into not creating Playlist in the 1st place
-        raise NoSongsError.new("No songs match that criteria!")
+        raise NoSongsError.new("No songs match those criteria!")
       end
     end
   end
 
   # Organize and transform!
-  def self.prepare_options!(options)
+  def self.prepare_options(options)
+
     if preset = options.delete(:preset)
-      options.replace load_preset(preset)
+      new_options = load_preset(preset)
     else
-      unless options[:tempo].is_a? Range
-        min_tempo = options.delete(:min_tempo) || 0
-        max_tempo = options.delete(:max_tempo) || 500
-        options[:tempo] = min_tempo..max_tempo
-      end
 
-      unless options[:duration].is_a? Range
-        min_duration = options.delete(:min_duration) || 10 # worthless jams
-        max_duration = options.delete(:max_duration) || 1200 # 20 min.
-        options[:duration] = min_duration..max_duration
-      end
+      new_options = DEFAULT_OPTIONS.reject{ |d| options.keys.include?(d.keys.first) }
 
-      if options.has_key?(:mode)
-        options[:mode] = MrEko.mode_lookup(options[:mode])
-      end
+      options.each do |key, value|
 
-      if options.has_key?(:key)
-        options[:key] = MrEko.key_lookup(options[:key])
+        case key
+
+        when :danceability, :energy, :loudness
+          new_options << transform(key, value, true)
+
+        when :mode
+          new_options << transform(key, MrEko.mode_lookup(value))
+
+        when :key
+          new_options << transform(key, MrEko.key_lookup(value))
+
+        else
+          new_options << transform(key, value)
+        end
       end
     end
+
+    new_options
   end
 
   # Return the formatted playlist.
@@ -71,6 +78,21 @@ class MrEko::Playlist < Sequel::Model
   end
 
   private
+
+  def self.transform(key, value, percentage=false)
+    if match = value.to_s.match(/(^[<>])(\d+)/)
+      operator = match[1]
+      value = match[2]
+
+      value = value.to_f / 100.0 if percentage
+
+      "#{key} #{operator} #{value}".lit
+    else
+      value = value.to_f / 100.0 if percentage
+      {key => value}
+    end
+  end
+
 
   # Returns a text representation of the Playlist.
   def create_text

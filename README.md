@@ -7,8 +7,8 @@ Example:
     # Scan all your music
     mreko scan ~/Music/*.mp3
 
-    # Output a PLS playlist of mid-tempo, minor-key music
-    mreko playlist --min-tempo 100 --max-tempo 120 --mode minor --format pls > rainy_day_suicidal_playlist.pls
+    # Output a PLS playlist of fast, minor-key music
+    mreko playlist --tempo '>120' --mode minor --format pls > rainy_day_suicidal_playlist.pls
 
     # Output a playlist of shorter,  up-tempo, danceable, major-keyed songs
     mreko playlist --preset gym --format pls > sweaty_playlist.pls
