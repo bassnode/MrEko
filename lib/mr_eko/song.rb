@@ -114,6 +114,7 @@ class MrEko::Song < Sequel::Model
                                       :title => tags.title,
                                       :bucket => 'audio_summary',
                                       :limit => 1).songs.first
+
     create do |song|
       song.filename       = File.expand_path(filename)
       song.md5            = md5
@@ -198,7 +199,7 @@ class MrEko::Song < Sequel::Model
   # @param [ID3Lib::Tag]
   # @return [ID3Lib::Tag]
   def self.clean_tags(tags)
-    ic = Iconv.new("ascii//IGNORE//TRANSLIT", "utf-16")
+    ic = Iconv.new("utf-8", "ucs-2")
 
     REQUIRED_ID3_TAGS.each do |rt|
       decoded = begin
