@@ -16,7 +16,7 @@ Example:
 Requirements:
 -------------
 * [ffmpeg](http://www.ffmpeg.org/download.htmlr) in your path.
-* an [Echonest API token](http://developer.echonest.com/) which goes here: ~/.mr_eko/echonest_api.key
+* an [Echonest API token](http://developer.echonest.com/) which goes here: ~/.mreko/echonest_api.key
 
 Notes:
 ------
