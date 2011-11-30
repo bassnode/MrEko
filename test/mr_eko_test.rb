@@ -23,7 +23,7 @@ class MrEkoTest < Test::Unit::TestCase
 
       should 'return the main DB when not in the test env' do
         MrEko.stubs(:env).returns('development')
-        assert_equal 'db/eko.db', MrEko.db_name
+        assert_equal File.join(MrEko::USER_DIR, 'eko.db'), MrEko.db_name
       end
     end
 

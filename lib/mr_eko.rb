@@ -1,6 +1,5 @@
 require "rubygems"
 require "bundler"
-Bundler.setup
 
 require "sqlite3"
 require "sequel"
@@ -20,7 +19,7 @@ EKO_ENV = ENV['EKO_ENV'] || 'development'
 Sequel.default_timezone = :utc
 
 module MrEko
-  VERSION = '0.3.0'
+  VERSION = '0.3.1'
   USER_DIR = File.join(ENV['HOME'], ".mreko")
   FINGERPRINTS_DIR = File.join(USER_DIR, 'fingerprints')
   LOG_DIR = File.join(USER_DIR, 'logs')
@@ -55,9 +54,9 @@ module MrEko
       setup_echonest!
     end
 
-    # Output to STDOUT in development, otherwise, save to logfile
+    # Output to STDOUT in debug, otherwise, save to logfile
     def setup_logger!
-      out = env == 'development' ? STDOUT : File.join(LOG_DIR, "#{env}.log")
+      out = ENV['DEBUG'] ? STDOUT : File.join(LOG_DIR, "#{env}.log")
       @logger ||= Logger.new(out)
     end
 
@@ -78,7 +77,7 @@ module MrEko
     end
 
     def db_name
-      env == 'test' ? File.join('db', 'eko_test.db') : File.join('db', 'eko.db')
+      env == 'test' ? File.join('db', 'eko_test.db') : File.join(USER_DIR, 'eko.db')
     end
 
     def api_key
@@ -127,10 +126,10 @@ end
 
 MrEko.setup!
 
-require "lib/mr_eko/ext/numeric"
-require "lib/mr_eko/ext/object"
-require "lib/mr_eko/core"
-require "lib/mr_eko/presets"
-require "lib/mr_eko/playlist"
-require "lib/mr_eko/timed_playlist"
-require "lib/mr_eko/song"
+require "mr_eko/ext/numeric"
+require "mr_eko/ext/object"
+require "mr_eko/core"
+require "mr_eko/presets"
+require "mr_eko/playlist"
+require "mr_eko/timed_playlist"
+require "mr_eko/song"
