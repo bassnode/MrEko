@@ -39,39 +39,36 @@ class MrEko::Song < Sequel::Model
   # @return [MrEko::Song] the created Song
   def self.catalog_via_enmfp(filename, opts={})
     md5 = opts[:md5] || MrEko.md5(filename)
-    fingerprint_json = enmfp_data(filename, md5)
+    log "Identifying with ENMFP code"
 
-    if fingerprint_json.keys.include?('error')
-      raise EnmfpError, "Errors returned in the ENMFP fingerprint data: #{fingerprint_json.error.inspect}"
-    else
-      begin
-        log "Identifying with ENMFP code"
+    begin
+      fingerprint_json = enmfp_data(filename, md5)
 
-        identify_options = {}.tap do |opts|
-          opts[:code]    = fingerprint_json.raw_data
-          opts[:artist]  = fingerprint_json.metadata.artist
-          opts[:title]   = fingerprint_json.metadata.title
-          opts[:release] = fingerprint_json.metadata.release
-          opts[:bucket]  = 'audio_summary'
-        end
-
-        profile = MrEko.nest.song.identify(identify_options)
-
-        raise EnmfpError, "Nothing returned" if profile.songs.empty?
-        profile = profile.songs.first
-
-        # Get the extended audio data from the profile
-        analysis = MrEko.nest.song.profile(:id => profile.id, :bucket => 'audio_summary').songs.first.audio_summary
-      rescue Exception => e
-        log %Q{Issues using ENMFP data "(#{e})" #{e.backtrace.join("\n")}}
-        analysis, profile = get_datapoints_by_upload(filename)
+      identify_options = {}.tap do |opts|
+        opts[:code]    = fingerprint_json.raw_data
+        opts[:artist]  = fingerprint_json.metadata.artist
+        opts[:title]   = fingerprint_json.metadata.title
+        opts[:release] = fingerprint_json.metadata.release
+        opts[:bucket]  = 'audio_summary'
       end
+
+      profile = MrEko.nest.song.identify(identify_options)
+
+      raise EnmfpError, "Nothing returned" if profile.songs.empty?
+      profile = profile.songs.first
+
+      # Get the extended audio data from the profile
+      analysis = MrEko.nest.song.profile(:id => profile.id, :bucket => 'audio_summary').songs.first.audio_summary
+
+    rescue EnmfpError => e
+      log %Q{Issues using ENMFP data "(#{e})" #{e.backtrace.join("\n")}}
+      analysis, profile = get_datapoints_by_upload(filename)
     end
 
     create do |song|
       song.filename       = File.expand_path(filename)
       song.md5            = md5
-      song.code           = fingerprint_json.code
+      song.code           = fingerprint_json ? fingerprint_json.code : nil
       song.tempo          = analysis.tempo
       song.duration       = analysis.duration
       song.fade_in        = analysis.end_of_fade_in
@@ -110,10 +107,17 @@ class MrEko::Song < Sequel::Model
     return unless has_required_tags? tags
 
     md5 = opts[:md5] || MrEko.md5(filename)
-    analysis = MrEko.nest.song.search(:artist => tags.artist,
-                                      :title => tags.title,
-                                      :bucket => 'audio_summary',
-                                      :limit => 1).songs.first
+    begin
+      analysis = MrEko.nest.song.search(:artist => tags.artist,
+                                        :title => tags.title,
+                                        :bucket => 'audio_summary',
+                                        :limit => 1).songs.first
+    rescue => e
+      log "BAD TAGS? #{tags.artist} - #{tags.title} - #{filename}"
+      log e.message
+      log e.backtrace.join("\n")
+      return
+    end
 
     create do |song|
       song.filename       = File.expand_path(filename)
@@ -155,13 +159,23 @@ class MrEko::Song < Sequel::Model
   # @return [Hash] data from the ENMFP process
   def self.enmfp_data(filename, md5)
     unless File.exists?(fp_location(md5))
-      log 'Running ENMFP'
+      log 'Waiting for ENMFP binary...'
       `#{File.join(MrEko::HOME_DIR, 'ext', 'enmfp', MrEko.enmfp_binary)} "#{File.expand_path(filename)}" > #{fp_location(md5)}`
     end
 
-    raw_json = File.read fp_location(md5)
-    hash = Hashie::Mash.new(JSON.parse(raw_json).first)
-    hash.raw_data = raw_json
+    begin
+      raw_json = File.read fp_location(md5)
+      hash = Hashie::Mash.new(JSON.parse(raw_json).first)
+      hash.raw_data = raw_json
+
+      if hash.keys.include?('error')
+        raise EnmfpError, "Errors returned in the ENMFP fingerprint data: #{fingerprint_json.error.inspect}"
+      end
+
+    rescue JSON::ParserError => e
+      raise EnmfpError, e.message
+    end
+
     hash
   end
 
