@@ -91,7 +91,7 @@ class PlaylistTest < Test::Unit::TestCase
       end
 
       context "percentage values" do
-        [:loudness, :energy, :danceability].each do |attribute|
+        [:energy, :danceability].each do |attribute|
           should "translate #{attribute} into decimal form" do
             transformed = MrEko::Playlist.prepare_options({attribute => 32})
             assert_equal( {attribute => 0.32}, transformed.last )

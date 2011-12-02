@@ -43,7 +43,7 @@ class MrEko::Playlist < Sequel::Model
 
         case key
 
-        when :danceability, :energy, :loudness
+        when :danceability, :energy
           new_options << transform(key, value, true)
 
         when :mode
