@@ -155,8 +155,7 @@ end
 
 desc 'Launch an IRB console'
 task :console do
-  libs = "-rlib/mr_eko -rirb/completion -rruby-debug"
-  exec "irb #{libs}"
+  exec "bundle console"
 end
 
 namespace :db do

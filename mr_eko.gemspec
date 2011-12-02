@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   ## the sub! line in the Rakefile
   s.name              = 'mr_eko'
   s.version           = '0.3.2'
-  s.date              = '2011-11-30'
+  s.date              = '2011-12-02'
   s.rubyforge_project = 'mr_eko'
 
   ## Make sure your summary is short. The description may be as long
@@ -60,6 +60,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency('test-unit', "~> 2.1")
   s.add_development_dependency("ruby-debug")
   s.add_development_dependency("autotest")
+  s.add_development_dependency("pry")
 
   ## Leave this section as-is. It will be automatically generated from the
   ## contents of your Git repository via the gemspec task. DO NOT REMOVE
