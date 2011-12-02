@@ -102,7 +102,7 @@ class MrEko::TimedPlaylist
     direction = step_count > 0 ? :asc : :desc
     sorted_tempos = [attributes[:initial][:tempo], attributes[:final][:tempo]].sort
     tempo_range = Range.new(*sorted_tempos)
-    all_songs = MrEko::Song.where(:tempo => tempo_range).order("tempo #{direction}".lit).all
+    all_songs = MrEko::Song.where({:tempo => tempo_range} & ~{:duration => nil}).order("tempo #{direction}".lit).all
 
     songs_to_examine_per_step = step_count > all_songs.size ? 1 : all_songs.size / step_count
 

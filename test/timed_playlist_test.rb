@@ -57,7 +57,7 @@ class TimedPlaylistTest < Test::Unit::TestCase
       assert !list.step_map.empty?
     end
 
-    should 'increase the step length to 4.minutes if value is less that that' do
+    should 'increase the step length to 4.minutes if value is less than that' do
       list = MrEko::TimedPlaylist.new(:length => 300) do |pl|
         pl.initial(:tempo, 60)
         pl.final(:tempo, 80)
