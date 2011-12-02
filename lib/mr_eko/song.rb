@@ -72,7 +72,7 @@ class MrEko::Song < Sequel::Model
       song.bitrate        = profile.bitrate
       song.title          = profile.title
       song.artist         = profile.artist || profile.artist_name
-      song.album          = profile.release
+      song.album          = fingerprint_json ? fingerprint_json.metadata.release : profile.release
       song.danceability   = profile.audio_summary? ? profile.audio_summary.danceability : analysis.danceability
       song.energy         = profile.audio_summary? ? profile.audio_summary.energy       : analysis.energy
     end if analysis && profile
