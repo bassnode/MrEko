@@ -65,9 +65,16 @@ class SongTest < Test::Unit::TestCase
 
   context 'catalog_via_enmfp' do
 
-    should 'raise an error if the ENMFP fingerprint contains errors' do
-      MrEko::Song.stubs(:enmfp_data).returns(enmfp_data_stub('error' => 'BOOM'))
-      assert_raise(MrEko::Song::EnmfpError){ MrEko::Song.catalog_via_enmfp(TEST_MP3) }
+    should 'try uploading if the ENMFP fingerprint contains errors' do
+      MrEko::Song.stubs(:enmfp_data).raises(MrEko::Song::EnmfpError)
+      MrEko::Song.expects(:get_datapoints_by_upload).once.with(TEST_MP3).returns([])
+      MrEko::Song.catalog_via_enmfp(TEST_MP3)
+    end
+
+    should 'return nil when the file is too big' do
+      MrEko::Song.stubs(:file_too_big?).returns(true)
+      MrEko.nest.song.expects(:identify).never
+      assert_nil MrEko::Song.catalog_via_enmfp(TEST_MP3)
     end
 
     should 'try to upload when no songs are returned from the Song#identify call' do

@@ -38,8 +38,10 @@ class MrEko::Song < Sequel::Model
   # @option opts [String] :md5 pre-calculated MD5 of file
   # @return [MrEko::Song] the created Song
   def self.catalog_via_enmfp(filename, opts={})
+    return if file_too_big? filename
+
     md5 = opts[:md5] || MrEko.md5(filename)
-    log "Identifying with ENMFP code"
+    log "Identifying with ENMFP code #{filename}"
 
     begin
       fingerprint_json = enmfp_data(filename, md5)
@@ -54,7 +56,7 @@ class MrEko::Song < Sequel::Model
 
       profile = MrEko.nest.song.identify(identify_options)
 
-      raise EnmfpError, "Nothing returned" if profile.songs.empty?
+      raise EnmfpError, "Nothing returned from song/identify API call" if profile.songs.empty?
       profile = profile.songs.first
 
       # Get the extended audio data from the profile
@@ -84,7 +86,7 @@ class MrEko::Song < Sequel::Model
       song.album          = profile.release
       song.danceability   = profile.audio_summary? ? profile.audio_summary.danceability : analysis.danceability
       song.energy         = profile.audio_summary? ? profile.audio_summary.energy       : analysis.energy
-    end
+    end if analysis && profile
   end
 
   # Parses the file's ID3 tags and converts and strange encoding.
@@ -169,7 +171,7 @@ class MrEko::Song < Sequel::Model
       hash.raw_data = raw_json
 
       if hash.keys.include?('error')
-        raise EnmfpError, "Errors returned in the ENMFP fingerprint data: #{fingerprint_json.error.inspect}"
+        raise EnmfpError, "Errors returned in the ENMFP fingerprint data: #{hash.error.inspect}"
       end
 
     rescue JSON::ParserError => e
@@ -200,6 +202,10 @@ class MrEko::Song < Sequel::Model
   private
   def set_md5
     self.md5 ||= MrEko.md5(filename)
+  end
+
+  def self.file_too_big?(file)
+    File.size(file)/1024/1024 > 50
   end
 
   # Return the file path of the EN fingerprint JSON file
