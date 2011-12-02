@@ -36,7 +36,7 @@ class MrEko::Song < Sequel::Model
   # @param [String] location of the audio file
   # @param [Hash] opts
   # @option opts [String] :md5 pre-calculated MD5 of file
-  # @return [MrEko::Song] the created Song
+  # @return [MrEko::Song, NilClass] the created Song
   def self.catalog_via_enmfp(filename, opts={})
     return if file_too_big? filename
 
@@ -46,18 +46,7 @@ class MrEko::Song < Sequel::Model
     begin
       fingerprint_json = enmfp_data(filename, md5)
 
-      identify_options = {}.tap do |opts|
-        opts[:code]    = fingerprint_json.raw_data
-        opts[:artist]  = fingerprint_json.metadata.artist
-        opts[:title]   = fingerprint_json.metadata.title
-        opts[:release] = fingerprint_json.metadata.release
-        opts[:bucket]  = 'audio_summary'
-      end
-
-      profile = MrEko.nest.song.identify(identify_options)
-
-      raise EnmfpError, "Nothing returned from song/identify API call" if profile.songs.empty?
-      profile = profile.songs.first
+      profile = identify_from_enmfp_data(fingerprint_json)
 
       # Get the extended audio data from the profile
       analysis = MrEko.nest.song.profile(:id => profile.id, :bucket => 'audio_summary').songs.first.audio_summary
@@ -204,8 +193,29 @@ class MrEko::Song < Sequel::Model
     self.md5 ||= MrEko.md5(filename)
   end
 
+  # Is the song over a sane limit for uploading and ENMFP?
+  #
+  # @param [String] filename
+  # @return [Boolean]
   def self.file_too_big?(file)
     File.size(file)/1024/1024 > 50
+  end
+
+  # @param [Hash]
+  # @return [Hashie, EnmfpError] EN song API result
+  def self.identify_from_enmfp_data(json)
+    identify_options = {}.tap do |opts|
+      opts[:code]    = json.raw_data
+      opts[:artist]  = json.metadata.artist
+      opts[:title]   = json.metadata.title
+      opts[:release] = json.metadata.release
+      opts[:bucket]  = 'audio_summary'
+    end
+
+    profile = MrEko.nest.song.identify(identify_options)
+    raise EnmfpError, "Nothing returned from song/identify API call" if profile.songs.empty?
+
+    profile.songs.first
   end
 
   # Return the file path of the EN fingerprint JSON file
