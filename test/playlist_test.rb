@@ -31,11 +31,6 @@ class PlaylistTest < Test::Unit::TestCase
       assert_equal @playlist_count + 1, MrEko::Playlist.count
     end
 
-    should "filter out certain options before querying for songs" do
-      unfiltered_options = {:name => "Rock You in Your Face mix #{rand(1000)}", :time_signature => 4}
-      MrEko::Song.expects(:where).with(Not(has_key(:name))).once.returns(sequel_dataset_stub)
-      assert_raise(MrEko::Playlist::NoSongsError){ MrEko::Playlist.create_from_options(unfiltered_options) }
-    end
   end
 
   context 'output' do

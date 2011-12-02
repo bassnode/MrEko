@@ -17,15 +17,14 @@ class MrEko::Playlist < Sequel::Model
     # TODO: Is a name (or persisting) even necessary?
     MrEko.connection.transaction do
       pl = create(:name => options.delete(:name) || "Playlist #{rand(10000)}")
-      options = prepare_options(options)
 
+      filter = apply_filters prepare_options(options)
+      songs = filter.all
 
-      songs = MrEko::Song.where(options).all
       if songs.size > 0
         songs.each{ |song| pl.add_song(song) }
         pl.save
       else
-        # pl.delete # TODO: Look into not creating Playlist in the 1st place
         raise NoSongsError.new("No songs match those criteria!")
       end
     end
@@ -93,6 +92,13 @@ class MrEko::Playlist < Sequel::Model
     end
   end
 
+
+  # Recursively add Sequel where clauses
+  def self.apply_filters(options, filtered=nil)
+    filtered = (filtered || MrEko::Song).where(options.pop)
+    filtered = apply_filters(options, filtered) unless options.empty?
+    filtered
+  end
 
   # Returns a text representation of the Playlist.
   def create_text
