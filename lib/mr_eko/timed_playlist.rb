@@ -19,7 +19,7 @@ class MrEko::TimedPlaylist
 
 
   def initialize(opts={})
-    @attributes = Hash.new({})
+    @attributes = Hash.new{ |hsh, key| hsh[key] = {} }
     @step_map   = Hash.new
     @songs = []
 
