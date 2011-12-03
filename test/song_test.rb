@@ -1,3 +1,4 @@
+require 'ostruct'
 class SongTest < Test::Unit::TestCase
 
   TEST_MP3 = File.join(File.dirname(__FILE__), 'data', 'they_want_a_test.mp3')
@@ -22,6 +23,16 @@ class SongTest < Test::Unit::TestCase
     }.merge(overrides)
 
     Hashie::Mash.new(opts)
+  end
+
+  def song_identify_stub
+    Hashie::Mash.new(:artist_id => "ARZQYSZ1187FB3AC39", :artist_name => "Sebastian",
+                     :id => "SOEQMAC12A6701D920", :message => "OK (match type 6)", :score =>57, :tag => 0, :title => "Ross Ross Ross",
+                     :audio_summary => Hashie::Mash.new(:analysis_url => "url", :audio_md5 => "fb592e1fa581a8ad0b0478a45130e9e0",
+                                                        :danceability => 0.265574327869162, :duration =>1223,
+                                                        :energy => 0.732951527606216, :key => 11, :loudness =>-10.328,
+                                                        :mode => 0, :tempo => 137.538, :time_signature =>1)
+                    )
   end
 
   def setup
@@ -67,7 +78,7 @@ class SongTest < Test::Unit::TestCase
 
     should 'try uploading if the ENMFP fingerprint contains errors' do
       MrEko::Song.stubs(:enmfp_data).raises(MrEko::Song::EnmfpError)
-      MrEko::Song.expects(:get_datapoints_by_upload).once.with(TEST_MP3).returns([])
+      MrEko::Song.expects(:get_datapoints_by_upload).with(TEST_MP3).returns([stub_everything, stub_everything(:audio_summary => stub_everything, :id => 'yu82')])
       MrEko::Song.catalog_via_enmfp(TEST_MP3)
     end
 
@@ -78,36 +89,13 @@ class SongTest < Test::Unit::TestCase
     end
 
     should 'try to upload when no songs are returned from the Song#identify call' do
-      stub_data = enmfp_data_stub
-      empty_profile_stub = stub(:songs => [])
-      id_opts = {
-        :code    => stub_data.raw_data,
-        :artist  => stub_data.metadata.artist,
-        :title   => stub_data.metadata.title,
-        :release => stub_data.metadata.release,
-        :bucket  => 'audio_summary'
-      }
-      MrEko::Song.stubs(:enmfp_data).returns(stub_data)
-      Echonest::ApiMethods::Song.any_instance.expects(:identify).with(id_opts).returns(empty_profile_stub)
-      MrEko::Song.expects(:get_datapoints_by_upload).returns([stub_everything, stub_everything(:id => 'whatever')])
+      MrEko::Song.stubs(:enmfp_data).returns(enmfp_data_stub)
+      MrEko::Song.expects(:identify_from_enmfp_data).with(enmfp_data_stub).raises(MrEko::Song::EnmfpError.new("no songs"))
+      MrEko::Song.expects(:get_datapoints_by_upload).returns([stub_everything, stub_everything(:audio_summary => stub_everything, :id => 'yu82')])
+
       MrEko::Song.catalog_via_enmfp(TEST_MP3)
     end
 
-    should 'try to get the profile data when a song is returned from the Song#identify call' do
-      stub_data = enmfp_data_stub
-      profile_stub = stub(:songs => [stub_everything(:id => 'FJJ299KLOP')])
-      profile_details_stub = stub(:songs => [stub(:audio_summary => stub_everything)])
-
-      MrEko::Song.stubs(:enmfp_data).returns(stub_data)
-      Echonest::ApiMethods::Song.any_instance.expects(:identify).returns(profile_stub)
-      Echonest::ApiMethods::Song.any_instance.expects(:profile).with(:id => 'FJJ299KLOP', :bucket => 'audio_summary').returns(profile_details_stub)
-      MrEko::Song.expects(:get_datapoints_by_upload).never
-
-
-      assert_difference 'MrEko::Song.count' do
-        MrEko::Song.catalog_via_enmfp(TEST_MP3)
-      end
-    end
   end
 
   context 'catalog_via_tags' do
