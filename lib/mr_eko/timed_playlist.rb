@@ -19,7 +19,7 @@ class MrEko::TimedPlaylist
 
 
   def initialize(opts={})
-    @attributes = Hash.new{ |hsh, key| hsh[key] = {} }
+    @attributes = Hash.new({})
     @step_map   = Hash.new
     @songs = []
 
@@ -95,7 +95,7 @@ class MrEko::TimedPlaylist
   end
 
   # XXX Just sketching this part out at the moment...
-  # needs tests (and complete logic!)
+  # needs tests and to work with attributes other than tempo!
   def find_songs
     step_count, step_length = step_map[:tempo]
     return unless step_count && step_length
@@ -107,27 +107,32 @@ class MrEko::TimedPlaylist
     songs_to_examine_per_step = step_count > all_songs.size ? 1 : all_songs.size / step_count
 
     overall_seconds_used = 0
-    all_songs.each_slice(songs_to_examine_per_step).each do |songs|
+    all_songs.each_slice(songs_to_examine_per_step).each do |step_songs|
       break if overall_seconds_used >= @length
 
       song_length_proximity = 0
-      length_map = songs.inject({}) do |hsh, song|
+      length_map = step_songs.inject({}) do |hsh, song|
         song_length_proximity = (song.duration - step_length).abs
         hsh[song_length_proximity] = song
         hsh
       end
 
       step_seconds_used = 0
+      song_set = []
       length_map.sort_by{ |key, song| key }.each do |length, song|
-        @songs << song
+        song_set << song
         step_seconds_used += song.duration
         overall_seconds_used += song.duration
         break if step_seconds_used >= step_length
       end
 
+      # Make sure the songs are added the required order as they have been
+      # sorted by duration and thus may be in an odd order.
+      song_set = direction == :asc ? song_set.sort_by(&:tempo) : song_set.sort_by(&:tempo).reverse
+      @songs = @songs + song_set
     end
     # Might need to make a cluster map here instead of just choosing enough
-    # songs to fulfill the step_length.  This is because the over
+    # songs to fulfill the step_length.  This is because the
     # Playlist#length can be fulfilled even before we reach the target/final
     # target.  I think a better rule would be to pluck a song having the
     # initial and final values and then try to evenly spread out the remaining
