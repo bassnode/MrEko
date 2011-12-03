@@ -45,12 +45,7 @@ class MrEko::Song < Sequel::Model
 
     begin
       fingerprint_json = enmfp_data(filename, md5)
-
       profile = identify_from_enmfp_data(fingerprint_json)
-
-      # Get the extended audio data from the profile
-      analysis = MrEko.nest.song.profile(:id => profile.id, :bucket => 'audio_summary').songs.first.audio_summary
-
     rescue EnmfpError => e
       log %Q{Issues using ENMFP data "(#{e})" #{e.backtrace.join("\n")}}
       analysis, profile = get_datapoints_by_upload(filename)
@@ -60,22 +55,20 @@ class MrEko::Song < Sequel::Model
       song.filename       = File.expand_path(filename)
       song.md5            = md5
       song.code           = fingerprint_json ? fingerprint_json.code : nil
-      song.tempo          = analysis.tempo
-      song.duration       = analysis.duration
-      song.fade_in        = analysis.end_of_fade_in
-      song.fade_out       = analysis.start_of_fade_out
-      song.key            = analysis.key
-      song.mode           = analysis.mode
-      song.loudness       = analysis.loudness
-      song.time_signature = analysis.time_signature
+      song.tempo          = profile.audio_summary.tempo
+      song.duration       = profile.audio_summary.duration
+      song.key            = profile.audio_summary.key
+      song.mode           = profile.audio_summary.mode
+      song.loudness       = profile.audio_summary.loudness
+      song.time_signature = profile.audio_summary.time_signature
       song.echonest_id    = profile.id
-      song.bitrate        = profile.bitrate
+      song.bitrate        = fingerprint_json ? fingerprint_json.metadata.bitrate : nil
       song.title          = profile.title
       song.artist         = profile.artist || profile.artist_name
       song.album          = fingerprint_json ? fingerprint_json.metadata.release : profile.release
-      song.danceability   = profile.audio_summary? ? profile.audio_summary.danceability : analysis.danceability
-      song.energy         = profile.audio_summary? ? profile.audio_summary.energy       : analysis.energy
-    end if analysis && profile
+      song.danceability   = profile.audio_summary.danceability
+      song.energy         = profile.audio_summary.energy
+    end
   end
 
   # Parses the file's ID3 tags and converts and strange encoding.
