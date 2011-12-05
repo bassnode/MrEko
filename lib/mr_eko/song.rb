@@ -115,13 +115,11 @@ class MrEko::Song < Sequel::Model
       song.echonest_id    = analysis.id
       song.title          = tags.title
       song.artist         = tags.artist
+      song.album          = tags.album
       song.danceability   = analysis.audio_summary.danceability
       song.energy         = analysis.audio_summary.energy
       # XXX: Won't have these from tags - worth getting from EN?
       # song.code           = fingerprint_json.code
-      # song.album          = album
-      # song.fade_in        = analysis.end_of_fade_in
-      # song.fade_out       = analysis.start_of_fade_out
       # XXX: ID3Lib doesn't return these - worth parsing?
       # song.bitrate        =  profile.bitrate
     end if analysis

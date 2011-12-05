@@ -1,7 +1,8 @@
 require 'rubygems'
 require 'rake'
 require 'date'
-# require "bundler"
+require "yard"
+
 #############################################################################
 #
 # Helper functions
@@ -63,20 +64,14 @@ task :coverage do
   sh "open coverage/index.html"
 end
 
-require 'rdoc/task'
-Rake::RDocTask.new do |rdoc|
-  rdoc.rdoc_dir = 'rdoc'
-  rdoc.title = "#{name} #{version}"
-  rdoc.rdoc_files.include('README*')
-  rdoc.rdoc_files.include('lib/**/*.rb')
-end
-
 #############################################################################
 #
 # Custom tasks (add your own tasks here)
 #
 #############################################################################
-
+YARD::Rake::YardocTask.new do |t|
+  t.files   = ['lib/**/*.rb','README.md']   # optional
+end
 
 
 #############################################################################

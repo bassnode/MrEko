@@ -13,8 +13,8 @@ Gem::Specification.new do |s|
   ## If your rubyforge_project name is different, then edit it and comment out
   ## the sub! line in the Rakefile
   s.name              = 'mr_eko'
-  s.version           = '0.3.4'
-  s.date              = '2011-12-02'
+  s.version           = '0.3.5'
+  s.date              = '2011-12-05'
   s.rubyforge_project = 'mr_eko'
 
   ## Make sure your summary is short. The description may be as long
@@ -61,6 +61,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency("ruby-debug")
   s.add_development_dependency("autotest")
   s.add_development_dependency("pry")
+  s.add_development_dependency("yard")
 
   ## Leave this section as-is. It will be automatically generated from the
   ## contents of your Git repository via the gemspec task. DO NOT REMOVE
@@ -76,6 +77,7 @@ Gem::Specification.new do |s|
     db/migrate/002_add_songs.rb
     db/migrate/003_add_useful_song_fields.rb
     db/migrate/04_add_code_to_songs.rb
+    db/migrate/05_remove_fades_from_song.rb
     ext/enmfp/LICENSE
     ext/enmfp/README
     ext/enmfp/RELEASE_NOTES
