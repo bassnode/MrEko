@@ -225,7 +225,7 @@ class MrEko::Song < Sequel::Model
     REQUIRED_ID3_TAGS.each do |rt|
       decoded = begin
         ic.iconv(tags.send(rt))
-      rescue Iconv::InvalidCharacter
+      rescue Iconv::InvalidCharacter, Iconv::IllegalSequence
         tags.send(rt)
       end
       decoded = nil if decoded.blank?
