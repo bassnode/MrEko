@@ -47,6 +47,8 @@ class TimedPlaylistTest < Test::Unit::TestCase
   context 'save' do
 
     should 'populate the step_map' do
+      create_song(:tempo => 100)
+
       list = MrEko::TimedPlaylist.new(:length => 360) do |pl|
         pl.initial(:tempo, 100)
         pl.final(:tempo, 106)
@@ -58,6 +60,8 @@ class TimedPlaylistTest < Test::Unit::TestCase
     end
 
     should 'increase the step length to 4.minutes if value is less than that' do
+      create_song(:tempo => 70)
+
       list = MrEko::TimedPlaylist.new(:length => 300) do |pl|
         pl.initial(:tempo, 60)
         pl.final(:tempo, 80)
@@ -68,6 +72,8 @@ class TimedPlaylistTest < Test::Unit::TestCase
     end
 
     should 'populate the step_map with the proper mode step data' do
+      create_song(:mode => 0)
+
       list = MrEko::TimedPlaylist.new(:length => 3060) do |pl|
         pl.initial(:mode, :major)
         pl.final(:mode, :minor)
@@ -78,6 +84,9 @@ class TimedPlaylistTest < Test::Unit::TestCase
     end
 
     should 'populate the step_map with the proper tempo and loudness step data' do
+      create_song(:tempo => 65)
+      create_song(:loudness => -10)
+
       list = MrEko::TimedPlaylist.new(:length => 3600) do |pl|
         pl.initial(:tempo, 60)
         pl.final(:tempo, 70)
@@ -92,6 +101,9 @@ class TimedPlaylistTest < Test::Unit::TestCase
     end
 
     should 'populate the step_map with the proper energy and danceability fractional step data' do
+      create_song(:energy => 0.7)
+      create_song(:danceability => 0.23)
+
       list = MrEko::TimedPlaylist.new(:length => 3600) do |pl|
         pl.initial(:energy, 0.622)
         pl.final(:energy, 0.888)
@@ -106,6 +118,8 @@ class TimedPlaylistTest < Test::Unit::TestCase
     end
 
     should 'populate the step_map with the proper key step data' do
+      create_song(:key => MrEko.key_lookup('C#'))
+
       list = MrEko::TimedPlaylist.new(:length => 3060) do |pl|
         pl.initial(:key, 'C#')
         pl.final(:key, 'A#')

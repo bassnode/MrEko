@@ -22,6 +22,7 @@ class MrEko::TimedPlaylist
     @attributes = Hash.new{ |hsh, key| hsh[key] = {} }
     @step_map   = Hash.new
     @songs = []
+    @overall_seconds_used = 0
 
     handle_opts(opts)
 
@@ -96,6 +97,13 @@ class MrEko::TimedPlaylist
 
   # XXX Just sketching this part out at the moment...
   # needs tests and to work with attributes other than tempo!
+  # NOTE: Might need to make a cluster map here instead of just choosing
+  # enough songs to fulfill the step_length.  This is because the
+  # Playlist#length can be fulfilled even before we reach the target/final
+  # target.  I think a better rule would be to pluck a song having the
+  # initial and final values and then try to evenly spread out the remaining
+  # time with the songs in the middle...hence the map of the clusters of
+  # songs.  Then we can make selections more intelliegently.
   def find_songs
     step_count, step_length = step_map[:tempo]
     return unless step_count && step_length
@@ -104,42 +112,47 @@ class MrEko::TimedPlaylist
     tempo_range = Range.new(*sorted_tempos)
     all_songs = MrEko::Song.where({:tempo => tempo_range} & ~{:duration => nil}).order("tempo #{direction}".lit).all
 
-    songs_to_examine_per_step = step_count > all_songs.size ? 1 : all_songs.size / step_count
+    raise "No songs" if all_songs.blank?
 
-    overall_seconds_used = 0
-    all_songs.each_slice(songs_to_examine_per_step).each do |step_songs|
-      break if overall_seconds_used >= @length
+    # Handle low song count by making 1 the min step size.
+    songs_to_examine_per_step = [1, all_songs.size / step_count].max
 
-      song_length_proximity = 0
-      length_map = step_songs.inject({}) do |hsh, song|
-        song_length_proximity = (song.duration - step_length).abs
-        hsh[song_length_proximity] = song
-        hsh
-      end
+    # Make sure the playlist starts/ends well.
+    grouped_songs = all_songs.in_groups_of(songs_to_examine_per_step, false)
+    [grouped_songs.shift, grouped_songs.pop].map{ |bookend| append_songs(bookend, step_length) }
 
-      step_seconds_used = 0
-      song_set = []
-      length_map.sort_by{ |key, song| key }.each do |length, song|
-        song_set << song
-        step_seconds_used += song.duration
-        overall_seconds_used += song.duration
-        break if step_seconds_used >= step_length
-      end
+    loop do
+      batch = grouped_songs.shift
+      break if @overall_seconds_used >= @length or batch.blank?
 
-      # Make sure the songs are added the required order as they have been
-      # sorted by duration and thus may be in an odd order.
-      song_set = direction == :asc ? song_set.sort_by(&:tempo) : song_set.sort_by(&:tempo).reverse
-      @songs = @songs + song_set
+      append_songs(batch, step_length)
     end
-    # Might need to make a cluster map here instead of just choosing enough
-    # songs to fulfill the step_length.  This is because the
-    # Playlist#length can be fulfilled even before we reach the target/final
-    # target.  I think a better rule would be to pluck a song having the
-    # initial and final values and then try to evenly spread out the remaining
-    # time with the songs in the middle...hence the map of the clusters of
-    # songs.  Then we can make selections more intelliegently.
 
-    @songs
+    direction == :asc ? @songs.sort_by(&:tempo) : @songs.sort_by(&:tempo).reverse
+  end
+
+  private
+  def append_songs(song_batch, step_length)
+    return if song_batch.blank?
+
+    step_seconds_used = 0
+    song_set = []
+
+    length_map = song_batch.inject({}) do |hsh, song|
+      song_length_proximity = (song.duration - step_length).abs
+      hsh[song_length_proximity] = song
+      hsh
+    end
+
+    length_map.sort_by{ |key, song| key }.each do |length, song|
+      song_set << song
+      step_seconds_used += song.duration
+      break if step_seconds_used >= step_length
+    end
+
+    @overall_seconds_used += step_seconds_used
+
+    @songs = @songs + song_set
   end
 end
 

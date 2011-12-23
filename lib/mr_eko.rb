@@ -126,8 +126,9 @@ end
 
 MrEko.setup!
 
-require "mr_eko/ext/numeric"
-require "mr_eko/ext/object"
+Dir.glob('lib/mr_eko/ext/*.rb').each do |f|
+  require f
+end
 require "mr_eko/core"
 require "mr_eko/presets"
 require "mr_eko/playlist"
