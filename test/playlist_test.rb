@@ -20,7 +20,7 @@ class PlaylistTest < Test::Unit::TestCase
 
     should "not create a playlist when there no songs found" do
       assert_equal 0, MrEko::Song.count
-      assert_raise(MrEko::Playlist::NoSongsError){ MrEko::Playlist.create_from_options(@options) }
+      assert_raise(MrEko::NoSongsError){ MrEko::Playlist.create_from_options(@options) }
       assert_equal @playlist_count, MrEko::Playlist.count
     end
 

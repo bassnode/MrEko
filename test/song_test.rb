@@ -77,7 +77,7 @@ class SongTest < Test::Unit::TestCase
   context 'catalog_via_enmfp' do
 
     should 'try uploading if the ENMFP fingerprint contains errors' do
-      MrEko::Song.stubs(:enmfp_data).raises(MrEko::Song::EnmfpError)
+      MrEko::Song.stubs(:enmfp_data).raises(MrEko::EnmfpError)
       MrEko::Song.expects(:get_datapoints_by_upload).with(TEST_MP3).returns([stub_everything, stub_everything(:audio_summary => stub_everything, :id => 'yu82')])
       MrEko::Song.catalog_via_enmfp(TEST_MP3)
     end
@@ -90,7 +90,7 @@ class SongTest < Test::Unit::TestCase
 
     should 'try to upload when no songs are returned from the Song#identify call' do
       MrEko::Song.stubs(:enmfp_data).returns(enmfp_data_stub)
-      MrEko::Song.expects(:identify_from_enmfp_data).with(enmfp_data_stub).raises(MrEko::Song::EnmfpError.new("no songs"))
+      MrEko::Song.expects(:identify_from_enmfp_data).with(enmfp_data_stub).raises(MrEko::EnmfpError.new("no songs"))
       MrEko::Song.expects(:get_datapoints_by_upload).returns([stub_everything, stub_everything(:audio_summary => stub_everything, :id => 'yu82')])
 
       MrEko::Song.catalog_via_enmfp(TEST_MP3)

@@ -6,8 +6,6 @@ class MrEko::Song < Sequel::Model
 
   REQUIRED_ID3_TAGS = [:artist, :title]
 
-  class EnmfpError < Exception; end
-
   # A wrapper which gets called by the bin file.
   # By default will try to extract the needed song info from the ID3 tags and
   # if fails, will analyze via ENMFP/upload.
@@ -46,7 +44,7 @@ class MrEko::Song < Sequel::Model
     begin
       fingerprint_json = enmfp_data(filename, md5)
       profile = identify_from_enmfp_data(fingerprint_json)
-    rescue EnmfpError => e
+    rescue MrEko::EnmfpError => e
       log %Q{Issues using ENMFP data "(#{e})" #{e.backtrace.join("\n")}}
       analysis, profile = get_datapoints_by_upload(filename)
     end
@@ -151,11 +149,11 @@ class MrEko::Song < Sequel::Model
       hash.raw_data = raw_json
 
       if hash.keys.include?('error')
-        raise EnmfpError, "Errors returned in the ENMFP fingerprint data: #{hash.error.inspect}"
+        raise MrEko::EnmfpError, "Errors returned in the ENMFP fingerprint data: #{hash.error.inspect}"
       end
 
     rescue JSON::ParserError => e
-      raise EnmfpError, e.message
+      raise MrEko::EnmfpError, e.message
     end
 
     hash
@@ -204,7 +202,7 @@ class MrEko::Song < Sequel::Model
     end
 
     profile = MrEko.nest.song.identify(identify_options)
-    raise EnmfpError, "Nothing returned from song/identify API call" if profile.songs.empty?
+    raise MrEko::EnmfpError, "Nothing returned from song/identify API call" if profile.songs.empty?
 
     profile.songs.first
   end

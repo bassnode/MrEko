@@ -3,8 +3,6 @@ class MrEko::Playlist < Sequel::Model
   include MrEko::Core
   include MrEko::Presets
 
-  class NoSongsError < Exception; end
-
   plugin :validation_helpers
   many_to_many :songs
   FORMATS = [:pls, :m3u, :text].freeze
@@ -25,7 +23,7 @@ class MrEko::Playlist < Sequel::Model
         songs.each{ |song| pl.add_song(song) }
         pl.save
       else
-        raise NoSongsError.new("No songs match those criteria!")
+        raise MrEko::NoSongsError.new("No songs match those criteria!")
       end
     end
   end

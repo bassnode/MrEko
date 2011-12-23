@@ -46,6 +46,19 @@ class TimedPlaylistTest < Test::Unit::TestCase
 
   context 'save' do
 
+    should 'raise an exception when there are no songs for the parameters' do
+
+      # No moar songs!
+      MrEko::Song.delete
+
+      list = MrEko::TimedPlaylist.new(:length => 360) do |pl|
+        pl.initial(:tempo, 100)
+        pl.final(:tempo, 106)
+      end
+
+      assert_raises(MrEko::NoSongsError){ list.save }
+    end
+
     should 'populate the step_map' do
       create_song(:tempo => 100)
 

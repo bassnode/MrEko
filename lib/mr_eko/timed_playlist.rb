@@ -112,7 +112,7 @@ class MrEko::TimedPlaylist
     tempo_range = Range.new(*sorted_tempos)
     all_songs = MrEko::Song.where({:tempo => tempo_range} & ~{:duration => nil}).order("tempo #{direction}".lit).all
 
-    raise "No songs" if all_songs.blank?
+    raise MrEko::NoSongsError, "so songs with those parameters" if all_songs.blank?
 
     # Handle low song count by making 1 the min step size.
     songs_to_examine_per_step = [1, all_songs.size / step_count].max
