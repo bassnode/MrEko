@@ -1,6 +1,6 @@
 class MrEko::TimedPlaylist
 
-  #
+  # The playlist content
   attr_reader :songs
 
   # The number of seconds the playlist should be.
@@ -128,7 +128,8 @@ class MrEko::TimedPlaylist
       append_songs(batch, step_length)
     end
 
-    direction == :asc ? @songs.sort_by(&:tempo) : @songs.sort_by(&:tempo).reverse
+    # Sort em
+    @songs = direction == :asc ? @songs.sort_by(&:tempo) : @songs.sort_by(&:tempo).reverse
   end
 
   private
