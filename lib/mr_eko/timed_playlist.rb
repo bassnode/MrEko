@@ -33,7 +33,7 @@ class MrEko::TimedPlaylist
   def save
     validate_attributes
     determine_steps
-    find_songs
+    populate
 
     self
   end
@@ -95,6 +95,18 @@ class MrEko::TimedPlaylist
     step_map
   end
 
+  def find_songs(attribute=:tempo)
+    step_count, step_length = step_map[attribute]
+    direction = step_count > 0 ? :asc : :desc
+
+    sorted = [attributes[:initial][attribute], attributes[:final][attribute]].sort
+    all_songs = MrEko::Song.where({attribute => Range.new(*sorted)} & ~{:duration => nil}).order("#{attribute} #{direction}".lit).all
+
+    raise MrEko::NoSongsError, "no songs with those #{attribute} parameters" if all_songs.blank?
+
+    all_songs
+  end
+
   # XXX Just sketching this part out at the moment...
   # needs tests and to work with attributes other than tempo!
   # NOTE: Might need to make a cluster map here instead of just choosing
@@ -104,15 +116,11 @@ class MrEko::TimedPlaylist
   # initial and final values and then try to evenly spread out the remaining
   # time with the songs in the middle...hence the map of the clusters of
   # songs.  Then we can make selections more intelliegently.
-  def find_songs
+  def populate
     step_count, step_length = step_map[:tempo]
     return unless step_count && step_length
-    direction = step_count > 0 ? :asc : :desc
-    sorted_tempos = [attributes[:initial][:tempo], attributes[:final][:tempo]].sort
-    tempo_range = Range.new(*sorted_tempos)
-    all_songs = MrEko::Song.where({:tempo => tempo_range} & ~{:duration => nil}).order("tempo #{direction}".lit).all
 
-    raise MrEko::NoSongsError, "so songs with those parameters" if all_songs.blank?
+    all_songs = find_songs
 
     # Handle low song count by making 1 the min step size.
     songs_to_examine_per_step = [1, all_songs.size / step_count].max
@@ -129,6 +137,7 @@ class MrEko::TimedPlaylist
     end
 
     # Sort em
+    direction = step_count > 0 ? :asc : :desc
     @songs = direction == :asc ? @songs.sort_by(&:tempo) : @songs.sort_by(&:tempo).reverse
   end
 
