@@ -9,7 +9,6 @@ class MrEko::TimedPlaylist < MrEko::Playlist
   # The start and end value for the facet
   attr_accessor :initial, :final
 
-
   def initialize(opts={})
     @facet = opts.delete(:facet)
     @length = opts.delete(:length)
@@ -17,6 +16,8 @@ class MrEko::TimedPlaylist < MrEko::Playlist
     super
   end
 
+  # Have to add songs after save due to the Playlist needing to have a primary
+  # key (generated at time of save). Lame.
   def after_save
     prepare_attributes
     find_song_groups!
@@ -26,11 +27,10 @@ class MrEko::TimedPlaylist < MrEko::Playlist
     # Sort em
     direction = final - initial > 0 ? :asc : :desc
     songs = songs.sort_by(&facet)
-    songs = songs.reverse if direction == :asc
+    songs = songs.reverse if direction == :desc
 
-    songs.each do |song|
-      puts "#{song[facet]}"
-      self.add_song song
+    songs.each_with_index do |song, position|
+      MrEko::PlaylistEntry.create(:playlist_id => self.id, :song_id => song.id, :position => position)
     end
   end
 

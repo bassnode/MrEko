@@ -2,7 +2,7 @@
 class MrEko::Song < Sequel::Model
   include MrEko::Core
   plugin :validation_helpers
-  many_to_many :playlists
+  many_to_many :playlists, :through => :playlist_entries
 
   REQUIRED_ID3_TAGS = [:artist, :title]
 

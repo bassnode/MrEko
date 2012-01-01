@@ -19,7 +19,7 @@ EKO_ENV = ENV['EKO_ENV'] || 'development'
 Sequel.default_timezone = :utc
 
 module MrEko
-  VERSION = '0.4.0'
+  VERSION = '0.4.1'
   USER_DIR = File.join(ENV['HOME'], ".mreko")
   FINGERPRINTS_DIR = File.join(USER_DIR, 'fingerprints')
   LOG_DIR = File.join(USER_DIR, 'logs')
@@ -135,3 +135,4 @@ require "mr_eko/presets"
 require "mr_eko/playlist"
 require "mr_eko/timed_playlist"
 require "mr_eko/song"
+require "mr_eko/playlist_entry"

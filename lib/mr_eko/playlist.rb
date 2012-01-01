@@ -4,7 +4,7 @@ class MrEko::Playlist < Sequel::Model
   include MrEko::Presets
 
   plugin :validation_helpers
-  many_to_many :songs
+  many_to_many :songs, :join_table => :playlist_entries, :order => :playlist_entries__position.asc
   FORMATS = [:pls, :m3u, :text].freeze
   DEFAULT_OPTIONS = [ {:tempo => 0..500}, {:duration => 10..1200} ].freeze
 

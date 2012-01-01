@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
   ## If your rubyforge_project name is different, then edit it and comment out
   ## the sub! line in the Rakefile
   s.name              = 'mr_eko'
-  s.version           = '0.4.0'
+  s.version           = '0.4.1'
   s.date              = '2012-01-01'
   s.rubyforge_project = 'mr_eko'
 
@@ -78,6 +78,7 @@ Gem::Specification.new do |s|
     db/migrate/003_add_useful_song_fields.rb
     db/migrate/04_add_code_to_songs.rb
     db/migrate/05_remove_fades_from_song.rb
+    db/migrate/06_add_song_position.rb
     ext/enmfp/LICENSE
     ext/enmfp/README
     ext/enmfp/RELEASE_NOTES
@@ -96,6 +97,7 @@ Gem::Specification.new do |s|
     lib/mr_eko/ext/numeric.rb
     lib/mr_eko/ext/object.rb
     lib/mr_eko/playlist.rb
+    lib/mr_eko/playlist_entry.rb
     lib/mr_eko/presets.rb
     lib/mr_eko/song.rb
     lib/mr_eko/timed_playlist.rb
