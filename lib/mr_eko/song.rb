@@ -233,5 +233,3 @@ class MrEko::Song < Sequel::Model
     tags
   end
 end
-
-MrEko::Song.plugin :timestamps

@@ -126,5 +126,3 @@ class MrEko::Playlist < Sequel::Model
     "TBD"
   end
 end
-
-MrEko::Playlist.plugin :timestamps
