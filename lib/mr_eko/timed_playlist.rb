@@ -16,12 +16,16 @@ class MrEko::TimedPlaylist < MrEko::Playlist
     super
   end
 
+  # Run these essential steps before saving, so that any fatal exception halt
+  # the creation of the playlist.
+  def before_save
+    prepare_attributes
+    find_song_groups!
+  end
+
   # Have to add songs after save due to the Playlist needing to have a primary
   # key (generated at time of save). Lame.
   def after_save
-    prepare_attributes
-    find_song_groups!
-
     songs = @song_groups.sort_by{ |group| cost_of group }.first
 
     # Sort em
@@ -43,8 +47,8 @@ class MrEko::TimedPlaylist < MrEko::Playlist
 
     case facet
     when :danceability, :energy
-      @initial = (intial * 10).round
-      @final = (final * 10).round
+      @initial = (initial / 100.0)
+      @final = (final / 100.0)
     when :mode
       @initial = MrEko.mode_lookup(initial)
       @final = MrEko.mode_lookup(final)
@@ -55,29 +59,33 @@ class MrEko::TimedPlaylist < MrEko::Playlist
   end
 
   def find_song_groups!(iterations=50)
-
     sorted = [initial, final].sort
     # Get every song in the required range
     all_songs = MrEko::Song.where({facet => Range.new(*sorted)} & ~{:duration => nil}).all
-    raise MrEko::NoSongsError, "no songs with those '#{facet}' parameters" if all_songs.blank?
+
+    if all_songs.blank?
+      raise MrEko::NoSongsError, "no songs with those '#{facet}' parameters"
+    elsif all_songs.length == 1 # Might want to warn/raise here?
+      @song_groups = [ all_songs ]
+      return
+    end
 
     # Populate a number of potential playlists
     @song_groups = Array.new(iterations) do
       seconds_used = 0
       group = []
-      until seconds_used >= @length do
-        random_index = rand(all_songs.length - 1)
-        song = all_songs.delete_at(random_index)
+      available_songs = all_songs.dup
+
+      until seconds_used >= @length or available_songs.empty? do
+        random_index = rand(available_songs.length - 1)
+        song = available_songs.delete_at(random_index)
         seconds_used += song.duration
         group << song
       end
 
       group
     end
-
   end
-
-  private
 
   # How bad is the passed group of songs with respect to the TimedPlaylist's
   # facet and length contraints?

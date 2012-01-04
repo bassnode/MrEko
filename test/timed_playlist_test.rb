@@ -10,30 +10,9 @@ class TimedPlaylistTest < Test::Unit::TestCase
 
   end
 
-  context 'initial' do
-
-    should 'add the attribute to the list of initial attributes' do
-      MrEko::TimedPlaylist.new(:length => 600, :name => 'sad shit', :facet => :mode) do |pl|
-        assert pl.initial = :minor
-        assert_equal :minor, pl.initial
-      end
-    end
-  end
-
-  context 'final' do
-
-    should 'add the attribute to the list of final attributes' do
-      MrEko::TimedPlaylist.new(:length => 200, :name => 'Rock', :facet => :tempo) do |pl|
-        assert pl.final = 120
-        assert_equal 120, pl.final
-      end
-    end
-  end
-
   context 'save' do
 
     should 'raise an exception when there are no songs for the parameters' do
-
       # No moar songs!
       MrEko::Song.delete
 
@@ -45,14 +24,84 @@ class TimedPlaylistTest < Test::Unit::TestCase
       assert_raises(MrEko::NoSongsError){ list.save }
     end
 
-    context 'validation' do
-      should "raise an exception when initial and final attribute keys don't match" do
-        pl = MrEko::TimedPlaylist.new(:length => 1000, :facet => :tempo) do |pl|
-          assert pl.initial = 66
+    context 'facet range' do
+
+      should 'add the attribute to the list of initial attributes' do
+        list = MrEko::TimedPlaylist.new(:length => 600, :name => 'sad shit', :facet => :mode)
+        list.initial = :minor
+
+        assert_equal :minor, list.initial
+      end
+
+      should 'add the attribute to the list of final attributes' do
+        list = MrEko::TimedPlaylist.new(:length => 200, :name => 'Rock', :facet => :tempo)
+        list.final = 120
+
+        assert_equal 120, list.final
+      end
+
+      should 'raise an error if only one facet boundary is set' do
+        list = MrEko::TimedPlaylist.new(:length => 3600, :facet => :mode)
+        list.initial = :minor
+
+        assert_raise(MrEko::InvalidAttributes){ list.save }
+      end
+
+      context 'value translation' do
+        [:energy, :danceability].each do |attr|
+          should "turn #{attr} into a percentage" do
+            song = create_song(attr => 0.76)
+            list = MrEko::TimedPlaylist.new(:length => 3600, :facet => attr)
+            list.initial = 60
+            list.final = 100
+            assert list.save
+
+            assert_equal 0.60, list.initial
+            assert_equal 1.0, list.final
+          end
         end
 
-        assert_raise(MrEko::InvalidAttributes){ pl.save }
+        should "translate mode into a number" do
+          song = create_song(:mode => 0)
+          list = MrEko::TimedPlaylist.new(:length => 3600, :facet => :mode)
+          list.initial = 'minor'
+          list.final = 'major'
+          assert list.save
+
+          assert_equal 0, list.initial
+          assert_equal 1, list.final
+        end
+
+        should "translate key into a number" do
+          song = create_song(:key => 5)
+          list = MrEko::TimedPlaylist.new(:length => 3600, :facet => :key)
+          list.initial = 'F'
+          list.final = 'A'
+          assert list.save
+
+          assert_equal 5, list.initial
+          assert_equal 9, list.final
+        end
       end
     end
+
+    # pending, until next time...
+    #context 'the songs' do
+    #  setup do
+    #    MrEko::Song.delete
+    #  end
+
+    #  should "populate the list of songs" do
+    #    60.times do |i|
+    #      create_song(:tempo => 50 + i , :duration => 1.minutes, :title => "Song #{i}")
+    #    end
+
+    #    list = MrEko::TimedPlaylist.new(:length => 30.minutes, :facet => :tempo)
+    #    list.initial = 50
+    #    list.final = 100
+    #    list.save
+    #  end
+    #end
   end
+
 end
