@@ -36,9 +36,12 @@ class MrEko::Song < Sequel::Model
   # @option opts [String] :md5 pre-calculated MD5 of file
   # @return [MrEko::Song, NilClass] the created Song
   def self.catalog_via_enmfp(filename, opts={})
+    md5 = opts[:md5] || MrEko.md5(filename)
+    existing = where(:md5 => md5).first
+    return existing unless existing.nil?
+
     return if file_too_big? filename
 
-    md5 = opts[:md5] || MrEko.md5(filename)
     log "Identifying with ENMFP code #{filename}"
 
     begin
@@ -55,7 +58,7 @@ class MrEko::Song < Sequel::Model
       song.code           = fingerprint_json ? fingerprint_json.code : nil
       song.tempo          = profile.audio_summary.tempo
       song.duration       = profile.audio_summary.duration
-      song.key            = profile.audio_summary.key
+      song.key            = profile.audio_summary[:key]
       song.mode           = profile.audio_summary.mode
       song.loudness       = profile.audio_summary.loudness
       song.time_signature = profile.audio_summary.time_signature

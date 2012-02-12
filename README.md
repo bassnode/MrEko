@@ -18,9 +18,11 @@ Example:
 
 Requirements:
 -------------
-* [ffmpeg](http://www.ffmpeg.org/download.htmlr) in your path.
+* [ffmpeg](http://www.ffmpeg.org/download.html) in your path.
 * an [Echonest API token](http://developer.echonest.com/) which goes here: ~/.mreko/echonest_api.key
 
 Notes:
 ------
-MrEko will make an audio fingerprint of a music file and attempt to use it to identify the song.  This is faster but not always successful (due to Echonest limitations) so some songs must be uploaded to Echonest.  This means that scanning a large and/or somewhat eclectic library **could take a good while**.
+MrEko will make an audio fingerprint of a music file and attempt to use it (along with ID3 tags) to retrieve data from Echonest.
+This can be fast but not always successful due to Echonest catalog limitations, so some songs must be uploaded to Echonest.
+This means that scanning a large and/or somewhat eclectic library **could take a good while**.
