@@ -85,23 +85,32 @@ class TimedPlaylistTest < Test::Unit::TestCase
       end
     end
 
-    # pending, until next time...
-    #context 'the songs' do
-    #  setup do
-    #    MrEko::Song.delete
-    #  end
+    context 'the songs' do
+      setup do
+        MrEko::Song.delete
+        @song_count = 40
 
-    #  should "populate the list of songs" do
-    #    60.times do |i|
-    #      create_song(:tempo => 50 + i , :duration => 1.minutes, :title => "Song #{i}")
-    #    end
+        @song_count.times do |i|
+          create_song(:tempo => 50 + i , :duration => 1.minutes, :title => "Song #{i}")
+        end
 
-    #    list = MrEko::TimedPlaylist.new(:length => 30.minutes, :facet => :tempo)
-    #    list.initial = 50
-    #    list.final = 100
-    #    list.save
-    #  end
-    #end
+        @list = MrEko::TimedPlaylist.new(:length => 30.minutes, :facet => :tempo, :initial => 50, :final => 100)
+        @list.save
+      end
+
+      should "fill the requested duration" do
+        assert_equal 30, @list.songs.size
+      end
+
+      should "fit the required constraints" do
+        assert @list.songs.all?{ |song| song.tempo >= @list.initial && song.tempo <= @list.final }
+      end
+
+      should "be sorted ascending, by default" do
+        sorted = @list.songs.sort_by &:tempo
+        assert_equal sorted, @list.songs
+      end
+    end
   end
 
 end
