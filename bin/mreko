@@ -13,7 +13,8 @@ def parse_options
   options = { :format => :pls }
 
   OptionParser.new do |opts|
-    opts.banner = "Usage: #{$0} scan|playlist [options]"
+    opts.banner = "MrEko version #{MrEko::VERSION}\n"
+    opts.banner += "Usage: mreko scan|playlist [options]"
 
     opts.separator ""
     opts.separator "Playlist options:"
@@ -75,6 +76,11 @@ def parse_options
 
     opts.on("-x", "--tags-only", "Only perform lookups using ID3 tags (no analyzing)") do
       options[:tags_only] = true
+    end
+
+    opts.on("-v", "--version", "Output version") do
+      puts MrEko::VERSION
+      exit
     end
 
     opts.separator "\nNote that if --timed is passed, you may only specify one facet, e.g --tempo. This value will be used as the starting point.
