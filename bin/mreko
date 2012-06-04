@@ -10,7 +10,7 @@ Sequel::Migrator.apply(MrEko.connection, File.join(File.dirname(__FILE__), "..",
 
 def parse_options
 
-  options = { :format => :text }
+  options = { :format => :pls }
 
   OptionParser.new do |opts|
     opts.banner = "Usage: #{$0} scan|playlist [options]"
@@ -18,7 +18,7 @@ def parse_options
     opts.separator ""
     opts.separator "Playlist options:"
 
-    opts.on("-p", "--preset NAME", String, "Select a preset.  Options are (#{MrEko::Presets::FACTORY.keys.join(', ')})") do |preset|
+    opts.on("-p", "--preset NAME", String, "Select a preset.  Options are: #{MrEko::Presets::FACTORY.keys.join(', ')}") do |preset|
       options[:preset] = preset
     end
 
@@ -46,11 +46,23 @@ def parse_options
       options[:loudness] = num
     end
 
+    opts.on("-k", "--key KEY", "Specify chromatic key (from C to B)") do |key|
+      options[:key] = key
+    end
+
     opts.on("-o", "--mode MODE", String, "Specify mode (minor or major)") do |mode|
       unless MrEko::MODES.include?(mode)
         raise ArgumentError.new("Mode must be #{MrEko::MODES.join(' or ')}")
       end
       options[:mode] = mode
+    end
+
+    opts.on("-x", "--timed SEC", "Limit this playlist to a certain length (in seconds).") do |length|
+      options[:timed] = length
+    end
+
+    opts.on("-z", "--final VAL", "Sets the ending value of a Timed Playlist") do |val|
+      options[:final] = val
     end
 
     opts.on("-f", "--format FORMAT", MrEko::Playlist::FORMATS,
@@ -65,7 +77,8 @@ def parse_options
       options[:tags_only] = true
     end
 
-    opts.separator ""
+    opts.separator "\nNote that if --timed is passed, you may only specify one facet, e.g --tempo. This value will be used as the starting point.
+You must also pass --final to set the final value. So for a 10 min. playlist which starts at 120 BPM and ends at 200 BPM: mr_eko playlist --timed 600 --tempo 120 --final 200\n\n"
 
     # No argument, shows at tail.  This will print an options summary.
     opts.on_tail("-h", "--help", "Show this message") do
@@ -97,10 +110,23 @@ when 'scan'
   files.each do |file|
     MrEko::Song.create_from_file!(file, options)
   end
+
 when 'playlist'
   format = options.delete(:format)
-  playlist = MrEko::Playlist.create_from_options(options)
+
+  if length = options.delete(:timed)
+    final = options.delete(:final)
+    raise ArgumentError.new("You may only provide one facet when creating a Timed Playlist!!") if options.keys.size > 1
+
+    facet    = options.keys.first
+    initial  = options[facet]
+    playlist = MrEko::TimedPlaylist.create(:length => length, :facet => facet, :initial => initial, :final => final)
+  else
+    playlist = MrEko::Playlist.create_from_options(options)
+  end
+
   puts playlist.output(format)
+
 else
   puts "nothing for #{ARGV[0]}"
 end

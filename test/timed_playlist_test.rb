@@ -94,8 +94,7 @@ class TimedPlaylistTest < Test::Unit::TestCase
           create_song(:tempo => 50 + i , :duration => 1.minutes, :title => "Song #{i}")
         end
 
-        @list = MrEko::TimedPlaylist.new(:length => 30.minutes, :facet => :tempo, :initial => 50, :final => 100)
-        @list.save
+        @list = MrEko::TimedPlaylist.create(:length => 30.minutes, :facet => :tempo, :initial => 50, :final => 100)
       end
 
       should "fill the requested duration" do

@@ -11,7 +11,7 @@ class MrEko::TimedPlaylist < MrEko::Playlist
 
   def initialize(opts={})
     @facet = opts.delete(:facet)
-    @length = opts.delete(:length)
+    @length = opts.delete(:length).to_i
 
     super
   end
@@ -47,15 +47,19 @@ class MrEko::TimedPlaylist < MrEko::Playlist
 
     case facet
     when :danceability, :energy
-      @initial = (initial / 100.0)
-      @final = (final / 100.0)
+      @initial = (initial.to_i / 100.0)
+      @final = (final.to_i / 100.0)
     when :mode
       @initial = MrEko.mode_lookup(initial)
       @final = MrEko.mode_lookup(final)
     when :key
       @initial = MrEko.key_lookup(initial)
       @final = MrEko.key_lookup(final)
+    else
+      @initial = initial.to_i
+      @final = final.to_i
     end
+
   end
 
   def find_song_groups!(iterations=50)
