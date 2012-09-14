@@ -3,5 +3,4 @@ Gemfile.lock
 *.key
 .DS_Store
 *.log
-*.mp3
 *.db
