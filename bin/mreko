@@ -5,9 +5,6 @@ $: << File.join(File.dirname(__FILE__), '../lib')
 require 'mr_eko'
 require 'optparse'
 
-require 'sequel/extensions/migration'
-Sequel::Migrator.apply(MrEko.connection, File.join(File.dirname(__FILE__), "..", "db", "migrate"))
-
 def parse_options
 
   options = { :format => :pls }

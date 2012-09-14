@@ -3,6 +3,7 @@ require "bundler"
 
 require "sqlite3"
 require "sequel"
+require 'sequel/extensions/migration'
 require "logger"
 require "hashie"
 require "digest/md5"
@@ -70,6 +71,9 @@ module MrEko
       return @connection if @connection
       @connection = Sequel.sqlite(db_name)
       @connection.loggers << @logger
+
+      File.unlink(MrEko.db_name) if File.exist?(MrEko.db_name) && env == 'test'
+      Sequel::Migrator.apply(MrEko.connection, File.join(File.dirname(__FILE__), "..", "db", "migrate"))
     end
 
     def setup_echonest!
