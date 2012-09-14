@@ -1,5 +1,5 @@
-class AddSongs < Sequel::Migration
-  def up
+Sequel.migration do
+  up do
     create_table(:songs) do
       primary_key :id
       String :md5, :length => 32
@@ -17,19 +17,19 @@ class AddSongs < Sequel::Migration
       Integer :mode, :length => 1
       DateTime :created_on
       DateTime :updated_on
-    
+
       index :md5, :unique => true
     end
-    
+
     create_table :playlists_songs do
       Integer :playlist_id
       Integer :song_id
-      
+
       index [:playlist_id, :song_id], :unique => true
     end
   end
-  
-  def down
+
+  down do
     drop_table :songs
     drop_table :playlists_songs
   end

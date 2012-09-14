@@ -1,5 +1,5 @@
-class AddSongPosition < Sequel::Migration
-  def up
+Sequel.migration do
+  up do
     alter_table(:playlists_songs) do
       add_column :position, Integer
     end
@@ -7,7 +7,7 @@ class AddSongPosition < Sequel::Migration
     rename_table :playlists_songs, :playlist_entries
   end
 
-  def down
+  down do
     alter_table(:playlists_songs) do
       drop_column :position
     end
