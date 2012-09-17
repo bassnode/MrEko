@@ -55,7 +55,7 @@ def parse_options
       options[:mode] = mode
     end
 
-    opts.on("-x", "--timed SEC", "Limit this playlist to a certain length (in seconds).") do |length|
+    opts.on("-x", "--timed SEC", "Limit this playlist to a certain length (in seconds)*") do |length|
       options[:timed] = length
     end
 
@@ -80,12 +80,15 @@ def parse_options
       exit
     end
 
-    opts.separator "\nNote that if --timed is passed, you may only specify one facet, e.g --tempo. This value will be used as the starting point.
-You must also pass --final to set the final value. So for a 10 min. playlist which starts at 120 BPM and ends at 200 BPM: mr_eko playlist --timed 600 --tempo 120 --final 200\n\n"
-
     # No argument, shows at tail.  This will print an options summary.
     opts.on_tail("-h", "--help", "Show this message") do
       puts opts
+      puts <<-EOM
+
+* Note that if --timed is passed, you may only specify one facet, e.g --tempo. This value will be used as the starting point.
+You must also pass --final to set the final value. So for a 10 min. playlist which starts at 120 BPM and ends at 200 BPM:
+  mr_eko playlist --timed 600 --tempo 120 --final 200\n
+      EOM
       exit
     end
 
