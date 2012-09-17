@@ -143,7 +143,7 @@ class MrEko::Song < Sequel::Model
   def self.enmfp_data(filename, md5)
     unless File.exists?(fp_location(md5))
       log 'Waiting for ENMFP binary...'
-      `#{File.join(MrEko::HOME_DIR, 'ext', 'enmfp', MrEko.enmfp_binary)} "#{File.expand_path(filename)}" > #{fp_location(md5)}`
+      `#{MrEko.enmfp_binary} "#{File.expand_path(filename)}" > #{fp_location(md5)}`
     end
 
     begin

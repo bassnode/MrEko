@@ -1,5 +1,9 @@
 class MrEkoTest < Test::Unit::TestCase
 
+  def path_to(binary)
+    File.join(MrEko::HOME_DIR, 'ext', 'enmfp', binary)
+  end
+
   context "the module" do
 
     should "return an Echonest API instance for nest" do
@@ -31,22 +35,22 @@ class MrEkoTest < Test::Unit::TestCase
 
       should 'return proper Darwin bin' do
         MrEko.stubs(:ruby_platform).returns("i686-darwin10.6.0")
-        assert_equal 'codegen.Darwin', MrEko.enmfp_binary
+        assert_equal path_to('codegen.Darwin'), MrEko.enmfp_binary
       end
 
       should 'return proper Windows bin' do
         MrEko.stubs(:ruby_platform).returns("Win32")
-        assert_equal 'codegen.windows.exe', MrEko.enmfp_binary
+        assert_equal path_to('codegen.windows.exe'), MrEko.enmfp_binary
       end
 
       should 'return proper 686 bin' do
         MrEko.stubs(:ruby_platform).returns("i686-linux")
-        assert_equal 'codegen.Linux-i686', MrEko.enmfp_binary
+        assert_equal path_to('codegen.Linux-i686'), MrEko.enmfp_binary
       end
 
       should 'return proper x86 bin' do
         MrEko.stubs(:ruby_platform).returns("x86_64-linux")
-        assert_equal 'codegen.Linux-x86_64', MrEko.enmfp_binary
+        assert_equal path_to('codegen.Linux-x86_64'), MrEko.enmfp_binary
       end
     end
   end

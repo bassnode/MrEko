@@ -108,7 +108,7 @@ module MrEko
 
     # Use the platform-specific binary.
     def enmfp_binary
-      case ruby_platform
+      bin = case ruby_platform
       when /darwin/
         'codegen.Darwin'
       when /686/
@@ -118,6 +118,8 @@ module MrEko
       else
         'codegen.windows.exe'
       end
+
+      File.join(HOME_DIR, 'ext', 'enmfp', bin)
     end
 
     def ruby_platform
