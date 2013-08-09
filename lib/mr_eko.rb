@@ -20,7 +20,7 @@ EKO_ENV = ENV['EKO_ENV'] || 'development'
 Sequel.default_timezone = :utc
 
 module MrEko
-  VERSION = '0.5.2'
+  VERSION = '0.5.3'
   USER_DIR = File.join(ENV['HOME'], ".mreko")
   FINGERPRINTS_DIR = File.join(USER_DIR, 'fingerprints')
   LOG_DIR = File.join(USER_DIR, 'logs')
@@ -132,9 +132,9 @@ end
 
 MrEko.setup!
 
-Dir.glob('lib/mr_eko/ext/*.rb').each do |f|
-  require f
-end
+require "mr_eko/ext/array"
+require "mr_eko/ext/numeric"
+require "mr_eko/ext/object"
 require "mr_eko/exceptions"
 require "mr_eko/core"
 require "mr_eko/presets"
