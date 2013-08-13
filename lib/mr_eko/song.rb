@@ -109,7 +109,7 @@ class MrEko::Song < Sequel::Model
       song.md5            = md5
       song.tempo          = analysis.audio_summary.tempo
       song.duration       = analysis.audio_summary.duration
-      song.key            = analysis.audio_summary.key
+      song.key            = analysis.audio_summary['key']
       song.mode           = analysis.audio_summary.mode
       song.loudness       = analysis.audio_summary.loudness
       song.time_signature = analysis.audio_summary.time_signature
@@ -221,15 +221,15 @@ class MrEko::Song < Sequel::Model
   # @param [Array<ID3Lib::Tag>]
   # @return [Array<ID3Lib::Tag>]
   def self.clean_tags(tags)
-    ic = Iconv.new("utf-8", "ucs-2")
 
-    REQUIRED_ID3_TAGS.each do |rt|
-      decoded = begin
-        ic.iconv(tags.send(rt))
-      rescue Iconv::InvalidCharacter, Iconv::IllegalSequence
-        tags.send(rt)
+    (REQUIRED_ID3_TAGS + [:album]).each do |rt|
+      tag = tags.send(rt).to_s
+      if tag.encoding != Encoding::UTF_8
+        decoded = tag.encode
+      else
+        decoded = tag
       end
-      decoded = nil if decoded.blank?
+
       tags.send("#{rt}=", decoded)
     end
 

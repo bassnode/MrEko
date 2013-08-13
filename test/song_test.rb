@@ -104,8 +104,8 @@ class SongTest < Test::Unit::TestCase
 
       setup do
         @mp3 = MrEko::Song.parse_id3_tags(TAGLESS_MP3)
-        assert_nil @mp3.artist
-        assert_nil @mp3.title
+        assert_empty @mp3.artist
+        assert_empty @mp3.title
       end
 
       should 'return nil' do
@@ -132,10 +132,10 @@ class SongTest < Test::Unit::TestCase
     end
   end
 
-  context 'cleaning funky ID3 tags' do
+  context 'cleaning encoded ID3 tags' do
 
-    should "decode iTunes' crazy tags" do
-      dm = Iconv.conv('UTF-16', 'LATIN1', 'Dead Meadow')
+    should "decode iTunes' encoded tags" do
+      dm = 'Dead Meadow'.encode(Encoding::UCS_2BE, Encoding::UTF_8)
       tag_stub = OpenStruct.new(:artist => dm, :title => 'Good Moaning')
       ID3Lib::Tag.expects(:new).once.returns(tag_stub)
       parsed_tags = MrEko::Song.parse_id3_tags(TEST_MP3)
@@ -143,11 +143,14 @@ class SongTest < Test::Unit::TestCase
       assert_equal "Dead Meadow", parsed_tags.artist
     end
 
-    should "not blow up when there isn't any crazy encoding" do
+    should "not alter the tags when they aren't encoded" do
       tag_stub = OpenStruct.new(:artist => 'Dead Meadow', :title => 'Good Moaning')
       ID3Lib::Tag.expects(:new).once.returns(tag_stub)
 
-      assert_nothing_raised{ MrEko::Song.parse_id3_tags(TEST_MP3) }
+      parsed = MrEko::Song.parse_id3_tags(TEST_MP3)
+
+      assert_equal parsed.artist, 'Dead Meadow'
+      assert_equal parsed.title, 'Good Moaning'
     end
   end
 end

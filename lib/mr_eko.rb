@@ -1,3 +1,5 @@
+Encoding.default_internal = Encoding::UTF_8
+
 require "rubygems"
 require "bundler"
 
@@ -10,7 +12,7 @@ require "digest/md5"
 require 'id3lib'
 require "echonest"
 begin
-  require 'ruby-debug'
+  require 'debugger'
 rescue LoadError
 end
 
@@ -20,7 +22,7 @@ EKO_ENV = ENV['EKO_ENV'] || 'development'
 Sequel.default_timezone = :utc
 
 module MrEko
-  VERSION = '0.5.3'
+  VERSION = '0.6.0'
   USER_DIR = File.join(ENV['HOME'], ".mreko")
   FINGERPRINTS_DIR = File.join(USER_DIR, 'fingerprints')
   LOG_DIR = File.join(USER_DIR, 'logs')

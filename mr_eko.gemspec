@@ -13,8 +13,8 @@ Gem::Specification.new do |s|
   ## If your rubyforge_project name is different, then edit it and comment out
   ## the sub! line in the Rakefile
   s.name              = 'mr_eko'
-  s.version           = '0.5.3'
-  s.date              = '2013-08-09'
+  s.version           = '0.6.0'
+  s.date              = '2013-08-12'
   s.rubyforge_project = 'mr_eko'
 
   ## Make sure your summary is short. The description may be as long
@@ -58,7 +58,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency('mocha', "= 0.9.8")
   s.add_development_dependency('shoulda', "~> 2.11")
   s.add_development_dependency('test-unit', "~> 2.1")
-  s.add_development_dependency("ruby-debug")
+  s.add_development_dependency("debugger")
   s.add_development_dependency("autotest")
   s.add_development_dependency("pry")
   s.add_development_dependency("yard")

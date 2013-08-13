@@ -26,6 +26,7 @@ Requirements:
 -------------
 * [ffmpeg](http://www.ffmpeg.org/download.html) in your path.
 * an [Echonest API token](http://developer.echonest.com/) which goes here: ~/.mreko/echonest_api.key
+* [Ruby 1.9.3](http://ruby-lang.org) or above
 
 TimedPlaylists:
 ---------------
