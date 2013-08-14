@@ -72,14 +72,14 @@ class MrEko::Song < Sequel::Model
     end
   end
 
-  # Parses the file's ID3 tags and converts and strange encoding.
+  # Parses the file's ID3 tags
   #
   # @param [String] The file path
-  # @return [ID3Lib::Tag]
+  # @return [MrEko::TagParser::Result]
   def self.parse_id3_tags(filename)
     log "Parsing ID3 tags"
 
-    clean_tags ID3Lib::Tag.new(filename, ID3Lib::V_ALL)
+    MrEko::TagParser.parse(filename)
   end
 
 
@@ -89,7 +89,8 @@ class MrEko::Song < Sequel::Model
   # @return [MrEko::Song]
   def self.catalog_via_tags(filename, opts={})
     tags = parse_id3_tags(filename)
-    return unless has_required_tags? tags
+
+    return unless tags.reject{ |k, v| v.blank? }.size >= REQUIRED_ID3_TAGS.size
 
     md5 = opts[:md5] || MrEko.md5(filename)
     begin
@@ -98,7 +99,7 @@ class MrEko::Song < Sequel::Model
                                         :bucket => 'audio_summary',
                                         :limit => 1).songs.first
     rescue => e
-      log "BAD TAGS? #{tags.artist} - #{tags.title} - #{filename}"
+      log "BAD TAGS? #{tags.inspect} #{filename}"
       log e.message
       log e.backtrace.join("\n")
       return
@@ -126,13 +127,6 @@ class MrEko::Song < Sequel::Model
     end if analysis
   end
 
-  def self.has_required_tags?(tags)
-    found = REQUIRED_ID3_TAGS.inject([]) do |present, meth|
-      present << tags.send(meth)
-    end
-
-    found.compact.size == REQUIRED_ID3_TAGS.size ? true : false
-  end
 
   # Using the Echonest Musical Fingerprint lib in the hopes
   # of sidestepping the mp3 upload process.
@@ -218,21 +212,4 @@ class MrEko::Song < Sequel::Model
     File.expand_path File.join(MrEko::FINGERPRINTS_DIR, "#{md5}.json")
   end
 
-  # @param [Array<ID3Lib::Tag>]
-  # @return [Array<ID3Lib::Tag>]
-  def self.clean_tags(tags)
-
-    (REQUIRED_ID3_TAGS + [:album]).each do |rt|
-      tag = tags.send(rt).to_s
-      if tag.encoding != Encoding::UTF_8
-        decoded = tag.encode
-      else
-        decoded = tag
-      end
-
-      tags.send("#{rt}=", decoded)
-    end
-
-    tags
-  end
 end

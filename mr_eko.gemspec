@@ -13,8 +13,8 @@ Gem::Specification.new do |s|
   ## If your rubyforge_project name is different, then edit it and comment out
   ## the sub! line in the Rakefile
   s.name              = 'mr_eko'
-  s.version           = '0.6.0'
-  s.date              = '2013-08-12'
+  s.version           = '0.6.1'
+  s.date              = '2013-08-13'
   s.rubyforge_project = 'mr_eko'
 
   ## Make sure your summary is short. The description may be as long
@@ -51,7 +51,7 @@ Gem::Specification.new do |s|
   s.add_dependency('httpclient', "~> 2.1")
   s.add_dependency('bassnode-ruby-echonest')
   s.add_dependency('json', "= 1.4.6")
-  s.add_dependency('id3lib-ruby')
+  s.add_dependency('taglib-ruby')
 
   ## List your development dependencies here. Development dependencies are
   ## those that are only needed during development
@@ -101,13 +101,16 @@ Gem::Specification.new do |s|
     lib/mr_eko/playlist_entry.rb
     lib/mr_eko/presets.rb
     lib/mr_eko/song.rb
+    lib/mr_eko/tag_parser.rb
     lib/mr_eko/timed_playlist.rb
     mr_eko.gemspec
     test/data/tagless.mp3
     test/data/they_want_a_test.mp3
+    test/data/unicode.mp3
     test/mr_eko_test.rb
     test/playlist_test.rb
     test/song_test.rb
+    test/tag_parser_test.rb
     test/test.rb
     test/timed_playlist_test.rb
   ]

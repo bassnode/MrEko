@@ -13,6 +13,11 @@ end
 
 class Test::Unit::TestCase
 
+  TEST_MP3 = File.join(File.dirname(__FILE__), 'data', 'they_want_a_test.mp3')
+  TAGLESS_MP3 = File.join(File.dirname(__FILE__), 'data', 'tagless.mp3')
+  UNICODE_MP3 = File.join(File.dirname(__FILE__), 'data', 'unicode.mp3')
+
+
   # Could be fleshed out some more.
   def sequel_dataset_stub
     data = mock()

@@ -1,9 +1,6 @@
 require 'ostruct'
 class SongTest < Test::Unit::TestCase
 
-  TEST_MP3 = File.join(File.dirname(__FILE__), 'data', 'they_want_a_test.mp3')
-  TAGLESS_MP3 = File.join(File.dirname(__FILE__), 'data', 'tagless.mp3')
-
   def enmfp_data_stub(overrides={})
     opts = {
       'code'         => '98ouhajsnd081oi2he0da8sdoihjasdi2y9e8aASD3e8yaushdjQWD',
@@ -100,12 +97,12 @@ class SongTest < Test::Unit::TestCase
 
   context 'catalog_via_tags' do
 
-    context 'for a mp3 with no useful tag information' do
+    context 'for a mp3 with no ID3 tag information' do
 
       setup do
         @mp3 = MrEko::Song.parse_id3_tags(TAGLESS_MP3)
-        assert_empty @mp3.artist
-        assert_empty @mp3.title
+        assert_nil @mp3.artist
+        assert_nil @mp3.title
       end
 
       should 'return nil' do
@@ -132,25 +129,4 @@ class SongTest < Test::Unit::TestCase
     end
   end
 
-  context 'cleaning encoded ID3 tags' do
-
-    should "decode iTunes' encoded tags" do
-      dm = 'Dead Meadow'.encode(Encoding::UCS_2BE, Encoding::UTF_8)
-      tag_stub = OpenStruct.new(:artist => dm, :title => 'Good Moaning')
-      ID3Lib::Tag.expects(:new).once.returns(tag_stub)
-      parsed_tags = MrEko::Song.parse_id3_tags(TEST_MP3)
-
-      assert_equal "Dead Meadow", parsed_tags.artist
-    end
-
-    should "not alter the tags when they aren't encoded" do
-      tag_stub = OpenStruct.new(:artist => 'Dead Meadow', :title => 'Good Moaning')
-      ID3Lib::Tag.expects(:new).once.returns(tag_stub)
-
-      parsed = MrEko::Song.parse_id3_tags(TEST_MP3)
-
-      assert_equal parsed.artist, 'Dead Meadow'
-      assert_equal parsed.title, 'Good Moaning'
-    end
-  end
 end
