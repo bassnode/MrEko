@@ -13,13 +13,14 @@ Gem::Specification.new do |s|
   ## If your rubyforge_project name is different, then edit it and comment out
   ## the sub! line in the Rakefile
   s.name              = 'mr_eko'
-  s.version           = '0.6.1'
-  s.date              = '2013-08-13'
+  s.version           = '0.6.2'
+  s.date              = '2013-08-14'
   s.rubyforge_project = 'mr_eko'
+  s.license           = 'MIT'
 
   ## Make sure your summary is short. The description may be as long
   ## as you like.
-  s.summary     = "Catalogs music file data and exposes a playlist interface"
+  s.summary     = "Detailed music playlist generator"
   s.description = "Catalogs music file data and exposes a playlist interface"
 
   ## List the primary authors. If there are a bunch of authors, it's probably
