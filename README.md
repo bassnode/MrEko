@@ -11,10 +11,10 @@ Example:
     mreko scan jakob-semaphore.mp3 pelican-drought.mp3
 
     # Output a PLS playlist of fast, minor-key music
-    mreko playlist --tempo '>120' --mode minor --format pls > rainy_day_suicidal_playlist.pls
+    mreko playlist --tempo '>120' --mode minor > rainy_day_suicidal_playlist.pls
 
     # Output a playlist of shorter,  up-tempo, danceable, major-keyed songs
-    mreko playlist --preset gym --format pls > sweaty_playlist.pls
+    mreko playlist --preset gym > sweaty_playlist.pls
 
     # Output a 30 minute playlist which builds from tempo 120 to 185 BPM. See notes on TimedPlaylists below.
     mreko playlist --timed 1800 --tempo 120 --final 185 > morning_commute.pls
