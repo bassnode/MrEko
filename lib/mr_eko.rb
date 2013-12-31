@@ -22,7 +22,7 @@ EKO_ENV = ENV['EKO_ENV'] || 'development'
 Sequel.default_timezone = :utc
 
 module MrEko
-  VERSION = '0.6.2'
+  VERSION = '0.7.0'
   USER_DIR = File.join(ENV['HOME'], ".mreko")
   FINGERPRINTS_DIR = File.join(USER_DIR, 'fingerprints')
   LOG_DIR = File.join(USER_DIR, 'logs')
@@ -43,7 +43,23 @@ module MrEko
     end
 
     def nest
+      handle_rate_limit
       @nest
+    end
+
+    # A bit ghetto since we can't easily access the
+    # HTTP headers Echonest returns detailing the
+    # rate limit. @TODO look at fixing this later.
+    def handle_rate_limit
+
+      requests_in_window = @connection[:api_logs].where("created_on >= ?", Time.now - 60).count
+
+      if requests_in_window >= 120
+        puts "Throttling you..."
+        sleep 1
+      end
+
+      @connection[:api_logs].insert(:created_on => Time.now)
     end
 
     def md5(filename)

@@ -145,7 +145,7 @@ end
 
 desc "Load all the codes"
 task :environment do
-  require 'lib/mr_eko'
+  require_relative 'lib/mr_eko'
 end
 
 desc 'Launch an IRB console'
