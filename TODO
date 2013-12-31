@@ -1,2 +1,5 @@
 * Figure out how to get FFMPEG included in gem (possible w/ licensing?)
+
 * Create a 'setup' routine that migrates the DB, creates the ~/.mr_eko dir, etc.  Doing it every time mr_eko runs is lame.
+
+* Support file formats other than MP3.  In most places it's supported, but a few tweaks are needed.
