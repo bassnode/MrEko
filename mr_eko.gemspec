@@ -56,7 +56,7 @@ Gem::Specification.new do |s|
 
   ## List your development dependencies here. Development dependencies are
   ## those that are only needed during development
-  s.add_development_dependency('mocha', "= 0.9.8")
+  s.add_development_dependency('mocha')
   s.add_development_dependency('shoulda', "~> 2.11")
   s.add_development_dependency('test-unit', "~> 2.1")
   s.add_development_dependency("debugger")

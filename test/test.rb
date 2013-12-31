@@ -3,7 +3,7 @@ require "bundler/setup"
 
 require 'test/unit'
 require 'shoulda'
-require 'mocha'
+require 'mocha/setup'
 require "mr_eko"
 require "ruby-debug"
 # Clear the tables out
