@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
   ## If your rubyforge_project name is different, then edit it and comment out
   ## the sub! line in the Rakefile
   s.name              = 'mr_eko'
-  s.version           = '0.7.0'
+  s.version           = '0.7.1'
   s.date              = '2013-12-30'
   s.rubyforge_project = 'mr_eko'
   s.license           = 'MIT'
@@ -47,18 +47,18 @@ Gem::Specification.new do |s|
   ## List your runtime dependencies here. Runtime dependencies are those
   ## that are needed for an end user to actually USE your code.
   s.add_dependency('sequel', "= 3.15")
-  s.add_dependency('sqlite3-ruby', "~> 1.3")
+  s.add_dependency('sqlite3-ruby')
   s.add_dependency('hashie')
-  s.add_dependency('httpclient', "~> 2.1")
+  s.add_dependency('httpclient')
   s.add_dependency('bassnode-ruby-echonest')
-  s.add_dependency('json', "= 1.4.6")
+  s.add_dependency('json')
   s.add_dependency('taglib-ruby')
 
   ## List your development dependencies here. Development dependencies are
   ## those that are only needed during development
   s.add_development_dependency('mocha')
-  s.add_development_dependency('shoulda', "~> 2.11")
-  s.add_development_dependency('test-unit', "~> 2.1")
+  s.add_development_dependency('shoulda')
+  s.add_development_dependency('test-unit')
   s.add_development_dependency("debugger")
   s.add_development_dependency("autotest")
   s.add_development_dependency("pry")
