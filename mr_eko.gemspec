@@ -52,7 +52,7 @@ Gem::Specification.new do |s|
   s.add_dependency('httpclient')
   s.add_dependency('bassnode-ruby-echonest')
   s.add_dependency('json')
-  s.add_dependency('taglib-ruby')
+  s.add_dependency('ruby-mp3info')
 
   ## List your development dependencies here. Development dependencies are
   ## those that are only needed during development

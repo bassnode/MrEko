@@ -1,12 +1,11 @@
 class MrEko::TagParser
 
   def self.parse(filename)
-    TagLib::FileRef.open(filename, false) do |file|
-      tag = file.tag
+    Mp3Info.open(filename) do |file|
       result = Result.new
-      result.artist = tag.artist
-      result.title = tag.title
-      result.album = tag.album
+      result.artist = file.tag.artist
+      result.title = file.tag.title
+      result.album = file.tag.album
 
       result
     end

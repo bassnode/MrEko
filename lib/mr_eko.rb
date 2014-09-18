@@ -9,7 +9,7 @@ require 'sequel/extensions/migration'
 require "logger"
 require "hashie"
 require "digest/md5"
-require 'taglib'
+require 'mp3info'
 require "echonest"
 begin
   require 'debugger'
