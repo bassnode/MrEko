@@ -22,7 +22,7 @@ EKO_ENV = ENV['EKO_ENV'] || 'development'
 Sequel.default_timezone = :utc
 
 module MrEko
-  VERSION = '0.7.1'
+  VERSION = '0.7.3'
   USER_DIR = File.join(ENV['HOME'], ".mreko")
   FINGERPRINTS_DIR = File.join(USER_DIR, 'fingerprints')
   LOG_DIR = File.join(USER_DIR, 'logs')
