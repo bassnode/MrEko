@@ -47,22 +47,21 @@ Gem::Specification.new do |s|
   ## List your runtime dependencies here. Runtime dependencies are those
   ## that are needed for an end user to actually USE your code.
   s.add_dependency('sequel', "= 3.15")
-  s.add_dependency('sqlite3-ruby')
-  s.add_dependency('hashie')
-  s.add_dependency('httpclient')
-  s.add_dependency('bassnode-ruby-echonest')
-  s.add_dependency('json')
-  s.add_dependency('ruby-mp3info')
+  s.add_dependency('sqlite3-ruby', '~> 0')
+  s.add_dependency('hashie', '~> 0')
+  s.add_dependency('httpclient', '~> 0')
+  s.add_dependency('bassnode-ruby-echonest', '~> 0')
+  s.add_dependency('json', '~> 0')
+  s.add_dependency('ruby-mp3info', '~> 0')
 
   ## List your development dependencies here. Development dependencies are
   ## those that are only needed during development
-  s.add_development_dependency('mocha')
-  s.add_development_dependency('shoulda')
-  s.add_development_dependency('test-unit')
-  #s.add_development_dependency("debugger")
-  s.add_development_dependency("autotest")
-  s.add_development_dependency("pry")
-  s.add_development_dependency("yard")
+  s.add_development_dependency('mocha', '~> 0')
+  s.add_development_dependency('shoulda', '~> 0')
+  s.add_development_dependency('test-unit', '~> 0')
+  s.add_development_dependency("autotest", '~> 0')
+  s.add_development_dependency("pry", '~> 0')
+  s.add_development_dependency("yard", '~> 0')
 
   ## Leave this section as-is. It will be automatically generated from the
   ## contents of your Git repository via the gemspec task. DO NOT REMOVE
