@@ -11,10 +11,6 @@ require "hashie"
 require "digest/md5"
 require 'mp3info'
 require "echonest"
-begin
-  require 'debugger'
-rescue LoadError
-end
 
 STDOUT.sync = true
 
@@ -22,7 +18,7 @@ EKO_ENV = ENV['EKO_ENV'] || 'development'
 Sequel.default_timezone = :utc
 
 module MrEko
-  VERSION = '0.7.3'
+  VERSION = '0.7.4'
   USER_DIR = File.join(ENV['HOME'], ".mreko")
   FINGERPRINTS_DIR = File.join(USER_DIR, 'fingerprints')
   LOG_DIR = File.join(USER_DIR, 'logs')
