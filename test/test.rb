@@ -5,7 +5,6 @@ require 'test/unit'
 require 'shoulda'
 require 'mocha/setup'
 require "mr_eko"
-require "ruby-debug"
 # Clear the tables out
 (MrEko.connection.tables - [:schema_info]).each do |table|
   MrEko.connection.run "DELETE FROM #{table}"

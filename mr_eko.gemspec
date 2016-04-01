@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   ## the sub! line in the Rakefile
   s.name              = 'mr_eko'
   s.version           = '0.7.3'
-  s.date              = '2014-09-18'
+  s.date              = '2016-03-31'
   s.rubyforge_project = 'mr_eko'
   s.license           = 'MIT'
 
@@ -59,7 +59,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency('mocha')
   s.add_development_dependency('shoulda')
   s.add_development_dependency('test-unit')
-  s.add_development_dependency("debugger")
+  #s.add_development_dependency("debugger")
   s.add_development_dependency("autotest")
   s.add_development_dependency("pry")
   s.add_development_dependency("yard")
