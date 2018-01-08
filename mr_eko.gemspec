@@ -1,9 +1,3 @@
-## This is the rakegem gemspec template. Make sure you read and understand
-## all of the comments. Some sections require modification, and others can
-## be deleted if you don't need them. Once you understand the contents of
-## this file, feel free to delete any comments that begin with two hash marks.
-## You can find comprehensive Gem::Specification documentation, at
-## http://docs.rubygems.org/read/chapter/20
 Gem::Specification.new do |s|
   s.specification_version = 2 if s.respond_to? :specification_version=
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
@@ -13,8 +7,8 @@ Gem::Specification.new do |s|
   ## If your rubyforge_project name is different, then edit it and comment out
   ## the sub! line in the Rakefile
   s.name              = 'mr_eko'
-  s.version           = '0.7.3'
-  s.date              = '2016-03-31'
+  s.version           = '0.7.4'
+  s.date              = '2018-01-08'
   s.rubyforge_project = 'mr_eko'
   s.license           = 'MIT'
 
@@ -47,19 +41,19 @@ Gem::Specification.new do |s|
   ## List your runtime dependencies here. Runtime dependencies are those
   ## that are needed for an end user to actually USE your code.
   s.add_dependency('sequel', "= 3.15")
-  s.add_dependency('sqlite3-ruby', '~> 0')
-  s.add_dependency('hashie', '~> 0')
-  s.add_dependency('httpclient', '~> 0')
+  s.add_dependency('sqlite3-ruby', '~> 1.3')
+  s.add_dependency('hashie', '~> 3.0')
+  s.add_dependency('httpclient', '~> 2.8')
   s.add_dependency('bassnode-ruby-echonest', '~> 0')
-  s.add_dependency('json', '~> 0')
+  s.add_dependency('json', '~> 2.1')
   s.add_dependency('ruby-mp3info', '~> 0')
 
   ## List your development dependencies here. Development dependencies are
   ## those that are only needed during development
   s.add_development_dependency('mocha', '~> 0')
-  s.add_development_dependency('shoulda', '~> 0')
-  s.add_development_dependency('test-unit', '~> 0')
-  s.add_development_dependency("autotest", '~> 0')
+  s.add_development_dependency('shoulda', '~> 3.5')
+  s.add_development_dependency('test-unit', '~> 3.0')
+  s.add_development_dependency("autotest", '~> 4.4')
   s.add_development_dependency("pry", '~> 0')
   s.add_development_dependency("yard", '~> 0')
 
